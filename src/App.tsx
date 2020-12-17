@@ -1,8 +1,14 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import logo from "./logo.svg";
+import "./App.css";
 
 function App() {
+  const object = { a: 1, b: 2 };
+
+  // for (const [key, value] of Object.entries(object)) {
+  //   //  something
+  // }
+
   return (
     <div className="App">
       <header className="App-header">
