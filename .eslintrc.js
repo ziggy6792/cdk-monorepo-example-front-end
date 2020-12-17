@@ -35,14 +35,14 @@ module.exports = {
         singleQuote: true,
         // trailingComma: 'none'
       },
-    ],
-    'linebreak-style': 'off',
-    'prettier/prettier': [
       'error',
       {
         endOfLine: 'auto',
       },
     ],
+    'linebreak-style': 'off',
+    'no-use-before-define': 'off',
+    '@typescript-eslint/no-use-before-define': 'off',
     'max-len': [
       'error',
       160,
