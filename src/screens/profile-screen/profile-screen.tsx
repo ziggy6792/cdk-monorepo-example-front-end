@@ -1,3 +1,4 @@
+/* eslint-disable react/button-has-type */
 import React, { useEffect, useState, Fragment, Component } from 'react';
 
 import { Hub } from 'aws-amplify';
@@ -10,12 +11,16 @@ import Buttons from '../../modules/login-form/Buttons';
 import withAuthenticator from '../../hoc/withAuthenticator';
 import LoginForm from '../../modules/login-form';
 
-class ProfileScreen extends Component {
+interface Props {
+  auth: any;
+  client: any;
+}
+
+interface State {
+  formState: string;
+}
+class ProfileScreen extends React.Component<Props, State> {
   myListener: (data: any) => void;
-  state: {
-    formState: string;
-  };
-  props: any;
 
   constructor(props: any) {
     super(props);

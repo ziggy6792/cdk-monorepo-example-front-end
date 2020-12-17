@@ -36,6 +36,7 @@ module.exports = {
     //     // trailingComma: 'none'
     //   },
     // ],
+    'react/destructuring-assignment': 'off',
     '@typescript-eslint/no-use-before-define': 'off',
     'linebreak-style': 'off',
     'prettier/prettier': [
