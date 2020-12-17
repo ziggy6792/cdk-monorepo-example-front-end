@@ -1,7 +1,7 @@
 import React from 'react';
 
 import ApolloClient from 'apollo-client';
-import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory';
+import { InMemoryCache } from 'apollo-cache-inmemory';
 import { ApolloProvider } from 'react-apollo';
 import { createHttpLink } from 'apollo-link-http';
 import { setContext } from 'apollo-link-context';
@@ -10,15 +10,7 @@ import Auth from '@aws-amplify/auth';
 
 import awsconfig from './aws-exports';
 
-import introspectionQueryResultData from './graphql/fragmentTypes.json';
-
-import { resolvers, typeDefs } from './graphql/resolvers';
-import Main from './components/Main.jsx';
-
-const fragmentMatcher = new IntrospectionFragmentMatcher({
-  introspectionQueryResultData,
-});
-// import useAmplifyAuth from "./useAmplifyAuth";
+import Main from './components/Main';
 
 Auth.configure(awsconfig);
 
@@ -28,7 +20,7 @@ const httpLink = createHttpLink({
 
 const authLink = setContext((_, { headers }) => {
   return Auth.currentSession()
-    .then((data) => {
+    .then((data: any) => {
       console.log('current session', data.accessToken.jwtToken);
       return {
         headers: {
@@ -49,9 +41,9 @@ const authLink = setContext((_, { headers }) => {
 
 export const client = new ApolloClient({
   link: authLink.concat(httpLink),
-  cache: new InMemoryCache({ fragmentMatcher }),
-  typeDefs,
-  resolvers,
+  cache: new InMemoryCache(),
+  // typeDefs,
+  // resolvers,
 });
 
 const App = () => (
