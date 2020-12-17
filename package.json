@@ -43,9 +43,7 @@
     ]
   },
   "prettier": {
-    "singleQuote": true,
-    "semi": false,
-    "trailingComma": "none"
+    "singleQuote": true
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.10.0",
