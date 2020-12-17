@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 
 /* eslint-disable import/prefer-default-export */
 export const HELLO = gql`
-  query ListEvents {
+  query hello {
     hello
   }
 `;
