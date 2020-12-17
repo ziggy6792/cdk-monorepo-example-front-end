@@ -43,5 +43,17 @@ module.exports = {
         endOfLine: 'auto',
       },
     ],
+    'max-len': [
+      'error',
+      160,
+      2,
+      {
+        ignoreUrls: true,
+        ignoreComments: false,
+        ignoreRegExpLiterals: true,
+        ignoreStrings: false,
+        ignoreTemplateLiterals: false,
+      },
+    ],
   },
 };

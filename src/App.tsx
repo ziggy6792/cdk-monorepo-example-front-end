@@ -1,13 +1,7 @@
 import React from 'react';
 
-import { ApolloLink } from 'apollo-link';
-import { createSubscriptionHandshakeLink } from 'aws-appsync-subscription-link';
-import { createAuthLink } from 'aws-appsync-auth-link';
 import ApolloClient from 'apollo-client';
-import {
-  InMemoryCache,
-  IntrospectionFragmentMatcher,
-} from 'apollo-cache-inmemory';
+import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory';
 import { ApolloProvider } from 'react-apollo';
 import { createHttpLink } from 'apollo-link-http';
 import { setContext } from 'apollo-link-context';
@@ -28,28 +22,6 @@ const fragmentMatcher = new IntrospectionFragmentMatcher({
 
 Auth.configure(awsconfig);
 
-// Configure with app sync
-
-// const getAccessToken = () => Auth.currentSession().then((session) => session.getAccessToken().getJwtToken());
-
-// const config = {
-//   url: awsconfig.aws_appsync_graphqlEndpoint,
-//   region: awsconfig.aws_appsync_region,
-//   auth: {
-//     type: awsconfig.aws_appsync_authenticationType,
-//     // apiKey: awsconfig.aws_appsync_apiKey,
-//     jwtToken: getAccessToken,
-//   },
-//   disableOffline: true,
-// };
-
-// const link = ApolloLink.from([
-//   // @ts-ignore
-//   createAuthLink(config),
-//   // @ts-ignore
-//   createSubscriptionHandshakeLink(config),
-// ]);
-
 const httpLink = createHttpLink({
   uri: awsconfig.aws_appsync_graphqlEndpoint,
 });
@@ -65,7 +37,7 @@ const authLink = setContext((_, { headers }) => {
         },
       };
     })
-    .catch((err) => {
+    .catch(() => {
       // Not authenticated
       return {
         headers: {
