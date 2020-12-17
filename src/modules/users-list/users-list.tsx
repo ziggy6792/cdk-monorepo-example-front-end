@@ -5,7 +5,9 @@ import { HELLO } from '../../graphql/custom-queries';
 const UsersList = () => {
   const { loading, data, error } = useQuery(HELLO);
 
-  console.log('error', error);
+  if (error) {
+    console.log('error', error);
+  }
 
   return (
     <>
