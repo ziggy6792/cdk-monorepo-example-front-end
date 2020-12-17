@@ -1,8 +1,10 @@
 import React from 'react';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
-import Theme from '../components/ui/Theme';
-import { ROUTE_PROFILE, ROUTE_USERS } from '../conf/navigation';
+import Theme from '../ui/theme';
+import { ROUTE_PROFILE, ROUTE_HOME } from '../conf/navigation';
+import HomeScreen from '../screens/home-screen';
+import ProfileScreen from '../screens/profile-screen';
 
 const Routes = () => {
   return (
@@ -12,8 +14,8 @@ const Routes = () => {
           <Redirect to={ROUTE_PROFILE} />
         </Route>
         <Switch>
-          <Route exact path={ROUTE_USERS} render={() => <div>users</div>} />
-          <Route exact path={ROUTE_PROFILE} render={() => <div>profile</div>} />
+          <Route exact path={ROUTE_HOME} component={HomeScreen} />
+          <Route exact path={ROUTE_PROFILE} component={ProfileScreen} />
         </Switch>
       </BrowserRouter>
     </ThemeProvider>
