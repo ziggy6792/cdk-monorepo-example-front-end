@@ -1,10 +1,10 @@
 import React from 'react';
 import { ThemeProvider } from '@material-ui/core/styles';
-import { BrowserRouter, Switch, Route, Redirect, withRouter } from 'react-router-dom';
-import Theme from './ui/Theme';
+import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
+import Theme from '../components/ui/Theme';
 import { ROUTE_PROFILE, ROUTE_USERS } from '../conf/navigation';
 
-const Main = () => {
+const Routes = () => {
   return (
     <ThemeProvider theme={Theme}>
       <BrowserRouter>
@@ -20,4 +20,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default Routes;

@@ -9,8 +9,7 @@ import { setContext } from 'apollo-link-context';
 import Auth from '@aws-amplify/auth';
 
 import awsconfig from './aws-exports';
-
-import Main from './components/Main';
+import Routes from './routes';
 
 Auth.configure(awsconfig);
 
@@ -48,17 +47,14 @@ export const client = new ApolloClient({
 
 const App = () => (
   <div className="App">
-    {/* <Main /> */}
-    <Main />
+    <Routes />
   </div>
 );
 
 const WithProvider = () => (
   <ApolloProvider client={client}>
     <App />
-    {/* <div>hello world</div> */}
   </ApolloProvider>
-  // <div>hello world</div>
 );
 
 export default WithProvider;
