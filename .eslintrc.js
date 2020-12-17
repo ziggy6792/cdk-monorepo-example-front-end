@@ -29,20 +29,22 @@ module.exports = {
     project: './tsconfig.json',
   },
   rules: {
+    // 'prettier/prettier': [
+    //   'warn',
+    //   {
+    //     singleQuote: true,
+    //     // trailingComma: 'none'
+    //   },
+    // ],
+    '@typescript-eslint/no-use-before-define': 'off',
+    'linebreak-style': 'off',
     'prettier/prettier': [
       'warn',
       {
-        singleQuote: true,
-        // trailingComma: 'none'
-      },
-      'error',
-      {
         endOfLine: 'auto',
+        singleQuote: true,
       },
     ],
-    'linebreak-style': 'off',
-    'no-use-before-define': 'off',
-    '@typescript-eslint/no-use-before-define': 'off',
     'max-len': [
       'error',
       160,

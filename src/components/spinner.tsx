@@ -14,7 +14,7 @@ const Spinner = () => {
         position: 'absolute',
         left: '0',
         top: '0',
-        zIndex: '5000',
+        // zIndex: '5000',
       }}
     >
       <Grid item>

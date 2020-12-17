@@ -5,11 +5,17 @@ import { FaSignOutAlt } from 'react-icons/fa';
 
 import { withApollo } from 'react-apollo';
 
-import Form from '../../containers/auth/Form';
 import Spinner from '../../components/spinner';
+import Buttons from '../../modules/login-form/Buttons';
+import withAuthenticator from '../../hoc/withAuthenticator';
+import LoginForm from '../../modules/login-form';
 
 class ProfileScreen extends Component {
   myListener: (data: any) => void;
+  state: {
+    formState: string;
+  };
+  props: any;
 
   constructor(props: any) {
     super(props);
@@ -87,7 +93,7 @@ class ProfileScreen extends Component {
     if (this.state.formState === 'email') {
       return (
         <div style={styles.appContainer}>
-          <Form />
+          <LoginForm />
         </div>
       );
     }
@@ -112,13 +118,13 @@ class ProfileScreen extends Component {
                 }}
               >
                 <FaSignOutAlt color="white" />
-                <p style={{ ...styles.text }}>Sign Out</p>
+                <p style={{ ...styles.text } as any}>Sign Out</p>
               </button>
             </>
           )}
 
           {!this.props.auth.isAuthenticated && (
-            <Buttons updateFormState={(newState) => this.setState((prevState) => ({ ...prevState, formState: newState }))} />
+            <Buttons updateFormState={(newState: any) => this.setState((prevState) => ({ ...prevState, formState: newState }))} />
           )}
           {this.props.auth.isAuthenticated && <div style={styles.body}>Is Authenticated</div>}
         </div>

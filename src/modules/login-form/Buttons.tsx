@@ -1,31 +1,31 @@
+/* eslint-disable react/button-has-type */
 import React from 'react';
 
 import { Auth } from 'aws-amplify';
 import { FaFacebook, FaGoogle, FaEnvelope } from 'react-icons/fa';
-import { connect } from 'react-redux';
-import withAuthenticator from '../../hoc/withAuthenticator/with-authenticator.jsx';
+import withAuthenticator from '../../hoc/withAuthenticator/with-authenticator';
 
-function Buttons(props) {
+function Buttons(props: any) {
   return (
     <div>
-      <div style={styles.container}>
+      <div style={styles.container as any}>
         <button
-          style={{ ...styles.button, ...styles.facebook }}
+          style={{ ...styles.button, ...styles.facebook } as any}
           onClick={() => {
             props.auth.onLogin({ authType: 'Facebook' });
           }}
         >
           <FaFacebook color="white" />
-          <p style={styles.text}>Sign in with Facebook</p>
+          <p style={styles.text as any}>Sign in with Facebook</p>
         </button>
         <button
-          style={{ ...styles.button, ...styles.google }}
+          style={{ ...styles.button }}
           onClick={() => {
             props.auth.onLogin({ authType: 'Google' });
           }}
         >
           <FaGoogle color="red" />
-          <p style={{ ...styles.text, ...styles.grayText }}>Sign in with Google</p>
+          <p style={{ ...styles.text, ...styles.grayText } as any}>Sign in with Google</p>
         </button>
 
         <button
@@ -34,11 +34,11 @@ function Buttons(props) {
             props.auth.onLogin({ authType: 'HostedUi' });
           }}
         >
-          <p style={{ ...styles.text, ...styles.orangeText }}>Sign in with Hosted UI</p>
+          <p style={{ ...styles.text, ...styles.orangeText } as any}>Sign in with Hosted UI</p>
         </button>
         <button style={{ ...styles.button, ...styles.email }} onClick={() => props.updateFormState('email')}>
           <FaEnvelope color="white" />
-          <p style={{ ...styles.text }}>Sign in with Email</p>
+          <p style={{ ...styles.text } as any}>Sign in with Email</p>
         </button>
       </div>
     </div>
