@@ -10,6 +10,7 @@ import Auth from '@aws-amplify/auth';
 
 import awsconfig from './aws-exports';
 import Routes from './routes';
+import { resolvers, typeDefs } from './graphql/resolvers';
 
 Auth.configure(awsconfig);
 
@@ -41,8 +42,8 @@ const authLink = setContext((_, { headers }) => {
 export const client = new ApolloClient({
   link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
-  // typeDefs,
-  // resolvers,
+  typeDefs,
+  resolvers,
 });
 
 const App = () => (
