@@ -1,3 +1,6 @@
+/* eslint-disable react/button-has-type */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { useState, useReducer, useEffect } from 'react';
 
 import { Auth } from 'aws-amplify';
@@ -84,7 +87,7 @@ const LoginForm: React.FC<any> = (props: any) => {
         return (
           <SignIn
             signIn={() => {
-              props.auth.onLogin({ email: formState.email, password: formState.password });
+              console.log('login', { email: formState.email, password: formState.password });
             }}
             updateFormState={(e: any) => updateFormState({ type: 'updateFormState', e })}
             formState={formState}
@@ -263,4 +266,4 @@ const styles = {
   },
 };
 
-export default withAuthenticator(LoginForm);
+export default LoginForm;

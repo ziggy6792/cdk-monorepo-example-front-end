@@ -5,7 +5,8 @@ import Spinner from '../../components/spinner';
 import { LOGIN } from '../../graphql/local-mutations';
 import { GET_AUTHENTICATED_USER } from '../../graphql/local-queries';
 
-const withAuthenticator = (C: any) => (props: any) => {
+// eslint-disable-next-line @typescript-eslint/ban-types
+const withAuthenticator = <P extends object>(C: React.ComponentType<P>) => (props: P) => {
   const { data: authUserData, loading: authUserLoading, refetch: onCheckAuth } = useQuery(GET_AUTHENTICATED_USER, { fetchPolicy: 'cache-and-network' });
 
   const [loginMutation, { loading: loginLoading }] = useMutation(LOGIN, {
@@ -57,7 +58,7 @@ const withAuthenticator = (C: any) => (props: any) => {
 
   // return <C {...props} user={user} auth={auth} onLogin={login} onCheckAuth={onCheckAuth} onLogout={onLogout} />;
   // eslint-disable-next-line react/jsx-props-no-spreading
-  return <C {...props} auth={auth} />;
+  return <C {...(props as P)} auth={auth} />;
 };
 
 export default withAuthenticator;

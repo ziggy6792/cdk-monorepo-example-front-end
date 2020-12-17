@@ -106,10 +106,12 @@ class ProfileScreen extends React.Component<Props, State> {
       return <Spinner />;
     }
 
+    const isAuthenticated = false;
+
     return (
       <>
         <div style={styles.appContainer}>
-          {this.props.auth.isAuthenticated && (
+          {isAuthenticated && (
             <>
               <h4>Welcome {this.props.auth.user.nameDisplayText}</h4>
               <button
@@ -128,14 +130,12 @@ class ProfileScreen extends React.Component<Props, State> {
             </>
           )}
 
-          {!this.props.auth.isAuthenticated && (
-            <Buttons updateFormState={(newState: any) => this.setState((prevState) => ({ ...prevState, formState: newState }))} />
-          )}
-          {this.props.auth.isAuthenticated && <div style={styles.body}>Is Authenticated</div>}
+          {!isAuthenticated && <Buttons updateFormState={(newState: any) => this.setState((prevState) => ({ ...prevState, formState: newState }))} />}
+          {isAuthenticated && <div style={styles.body}>Is Authenticated</div>}
         </div>
       </>
     );
   }
 }
 
-export default withAuthenticator(withApollo(ProfileScreen));
+export default withApollo(ProfileScreen);

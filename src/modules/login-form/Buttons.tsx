@@ -108,4 +108,4 @@ const styles = {
   },
 };
 
-export default withAuthenticator(Buttons);
+export default Buttons;
