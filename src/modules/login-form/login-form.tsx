@@ -82,7 +82,7 @@ const LoginForm: React.FC = () => {
           //   updateFormState={(e: any) => updateFormState({ type: 'updateFormState', e })}
           //   formState={formState}
           // />
-          <ConfirmSignUp confirmSignUp={(confirmationCode: string) => confirmSignUp({ email, confirmationCode }, updateFormType)} />
+          <ConfirmSignUp onSubmit={(confirmationCode: string) => confirmSignUp({ email, confirmationCode }, updateFormType)} />
         );
 
       default:
@@ -175,26 +175,33 @@ export const SignUp: React.FC<SignUpProps> = ({ signUp, signIn }) => {
 };
 
 interface IConfirmSignupProps {
-  confirmSignUp: (confirmationCode: string) => Promise<void>;
+  onSubmit: (confirmationCode: string) => Promise<void>;
 }
 
-const ConfirmSignUp: React.FC<IConfirmSignupProps> = () => {
+const ConfirmSignUp: React.FC<IConfirmSignupProps> = ({ onSubmit }) => {
   return (
-    // <div style={styles.container as any}>
-    //   <input
-    //     name='confirmationCode'
-    //     placeholder='Confirmation Code'
-    //     onChange={(e) => {
-    //       e.persist();
-    //       props.updateFormState(e);
-    //     }}
-    //     style={styles.input}
-    //   />
-    //   <button onClick={props.confirmSignUp} style={styles.button as any}>
-    //     Confirm Sign Up
-    //   </button>
-    // </div>
-    <div>confitm sign up</div>
+    <Formik
+      initialValues={{
+        confirmationCode: '',
+      }}
+      onSubmit={async (values) => {
+        await onSubmit(values.confirmationCode);
+      }}
+    >
+      {({ submitForm, isSubmitting }) => (
+        <Grid container direction='column'>
+          <Grid item>
+            <Field component={TextField} name='confirmationCode' label='Confirmation Code' />
+          </Grid>
+
+          <Grid item>
+            <Button variant='contained' color='primary' disabled={isSubmitting} onClick={submitForm}>
+              Confirm Sign Up
+            </Button>
+          </Grid>
+        </Grid>
+      )}
+    </Formik>
   );
 };
 
