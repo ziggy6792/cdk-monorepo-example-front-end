@@ -61,6 +61,7 @@
   },
   "prettier": {
     "singleQuote": true,
+    "jsxSingleQuote": true,
     "printWidth": 160
   },
   "devDependencies": {

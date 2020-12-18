@@ -3,47 +3,44 @@ import React from 'react';
 
 import { Auth } from 'aws-amplify';
 import { FaFacebook, FaGoogle, FaEnvelope } from 'react-icons/fa';
+import { Button, Grid } from '@material-ui/core';
+import { Facebook } from '@material-ui/icons';
 import withAuthenticator from '../../hoc/withAuthenticator/with-authenticator';
 
-function Buttons(props: any) {
-  return (
-    <div>
-      <div style={styles.container as any}>
-        <button
-          style={{ ...styles.button, ...styles.facebook } as any}
-          onClick={() => {
-            props.auth.onLogin({ authType: 'Facebook' });
-          }}
-        >
-          <FaFacebook color="white" />
-          <p style={styles.text as any}>Sign in with Facebook</p>
-        </button>
-        <button
-          style={{ ...styles.button }}
-          onClick={() => {
-            props.auth.onLogin({ authType: 'Google' });
-          }}
-        >
-          <FaGoogle color="red" />
-          <p style={{ ...styles.text, ...styles.grayText } as any}>Sign in with Google</p>
-        </button>
-
-        <button
-          style={{ ...styles.button, ...styles.hostedUI }}
-          onClick={() => {
-            props.auth.onLogin({ authType: 'HostedUi' });
-          }}
-        >
-          <p style={{ ...styles.text, ...styles.orangeText } as any}>Sign in with Hosted UI</p>
-        </button>
-        <button style={{ ...styles.button, ...styles.email }} onClick={() => props.updateFormState('email')}>
-          <FaEnvelope color="white" />
-          <p style={{ ...styles.text } as any}>Sign in with Email</p>
-        </button>
-      </div>
-    </div>
-  );
+interface IButtonsProps {
+  updateFormState: (formState: string) => void;
 }
+
+const Buttons: React.FC<IButtonsProps> = (props) => {
+  return (
+    <Grid container direction='column' justify='center' alignItems='center' style={{ height: '100%' }}>
+      <Grid item>
+        <Button color='primary' endIcon={<Facebook />} onClick={() => console.log({ authType: 'Facebook' })}>
+          Facebook
+        </Button>
+      </Grid>
+    </Grid>
+
+    // <div>
+    //   <div style={styles.container as any}>
+    //     <button
+    //       style={{ ...styles.button, ...styles.facebook } as any}
+    //       onClick={() => {
+    //         // props.auth.onLogin({ authType: 'Facebook' });
+    //         console.log({ authType: 'Facebook' });
+    //       }}
+    //     >
+    //       <FaFacebook color="white" />
+    //       <p style={styles.text as any}>Sign in with Facebook</p>
+    //     </button>
+    //     <button style={{ ...styles.button, ...styles.email }} onClick={() => props.updateFormState('email')}>
+    //       <FaEnvelope color="white" />
+    //       <p style={{ ...styles.text } as any}>Sign in with Email</p>
+    //     </button>
+    //   </div>
+    // </div>
+  );
+};
 
 const styles = {
   container: {

@@ -29,21 +29,17 @@ module.exports = {
     project: './tsconfig.json',
   },
   rules: {
-    // 'prettier/prettier': [
-    //   'warn',
-    //   {
-    //     singleQuote: true,
-    //     // trailingComma: 'none'
-    //   },
-    // ],
+    // quotes: [2, 'single', { avoidEscape: true }],
     'react/destructuring-assignment': 'off',
     '@typescript-eslint/no-use-before-define': 'off',
+    'react/prop-types': 'off',
     'linebreak-style': 'off',
     'prettier/prettier': [
       'warn',
       {
         endOfLine: 'auto',
         singleQuote: true,
+        jsxSingleQuote: true,
       },
     ],
     'max-len': [
