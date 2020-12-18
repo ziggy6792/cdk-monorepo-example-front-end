@@ -1,11 +1,15 @@
+/* eslint-disable no-alert */
 /* eslint-disable react/button-has-type */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import React, { useState, useReducer, useEffect } from 'react';
+import React, { useState, useReducer } from 'react';
 
 import { Auth } from 'aws-amplify';
 import Logger from 'js-logger';
-import withAuthenticator from '../../hoc/withAuthenticator';
+import { Formik, Field } from 'formik';
+import { TextField } from 'formik-material-ui';
+import { Button, Grid } from '@material-ui/core';
+import * as Yup from 'yup';
 
 interface IUser {
   email: string;
@@ -62,19 +66,14 @@ async function confirmSignUp({ email, confirmationCode }: { email: string; confi
   }
 }
 
-const LoginForm: React.FC<any> = (props: any) => {
+const LoginForm: React.FC<any> = () => {
   const [formType, updateFormType] = useState('signIn');
   const [formState, updateFormState] = useReducer(reducer, initialFormState);
+
   function renderForm() {
     switch (formType) {
       case 'signUp':
-        return (
-          <SignUp
-            signUp={() => signUp(formState, updateFormType)}
-            updateFormState={(e: any) => updateFormState({ type: 'updateFormState', e })}
-            formState={formState}
-          />
-        );
+        return <SignUp signUp={() => signUp(formState, updateFormType)} />;
       case 'confirmSignUp':
         return (
           <ConfirmSignUp
@@ -121,49 +120,118 @@ const LoginForm: React.FC<any> = (props: any) => {
   );
 };
 
-const SignUp: React.FC<any> = (props: any) => {
+const SignupSchema = Yup.object().shape({
+  firstName: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Required'),
+  lastName: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Required'),
+  email: Yup.string().email('Invalid email').required('Required'),
+  password: Yup.string().min(6, 'Too Short!').required('Required'),
+});
+
+interface Values {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
+
+interface SignUpProps {
+  signUp: () => Promise<void>;
+}
+
+export const SignUp: React.FC<SignUpProps> = () => {
+  return (
+    <Formik
+      initialValues={{
+        email: '',
+        firstName: '',
+        lastName: '',
+        password: '',
+      }}
+      validationSchema={SignupSchema}
+      validate={(values) => {
+        const errors: Partial<Values> = {};
+        if (!values.email) {
+          errors.email = 'Required';
+        } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
+          errors.email = 'Invalid email address';
+        }
+        return errors;
+      }}
+      onSubmit={(values, { setSubmitting }) => {
+        setTimeout(() => {
+          setSubmitting(false);
+          alert(JSON.stringify(values, null, 2));
+        }, 500);
+      }}
+    >
+      {({ submitForm, isSubmitting }) => (
+        <Grid container direction='column'>
+          <Grid item>
+            <Field component={TextField} name='email' type='email' label='Email' />
+          </Grid>
+          <Grid item>
+            <Field component={TextField} type='password' label='Password' name='password' />
+          </Grid>
+          <Grid item>
+            <Field component={TextField} name='firstName' label='First Name' />
+          </Grid>
+          <Grid item>
+            <Field component={TextField} name='lastName' label='Last Name' />
+          </Grid>
+          <Grid item>
+            <Button variant='contained' color='primary' disabled={isSubmitting} onClick={submitForm}>
+              Sign Up
+            </Button>
+          </Grid>
+        </Grid>
+      )}
+    </Formik>
+  );
+};
+
+const OldSignUp: React.FC<any> = (props: any) => {
   return (
     <div style={styles.container as any}>
       <input
-        name="email"
+        name='email'
         value={props.formState.email}
         onChange={(e) => {
           e.persist();
           props.updateFormState(e);
         }}
         style={styles.input}
-        placeholder="email"
+        placeholder='email'
       />
       <input
-        type="password"
-        name="password"
+        type='password'
+        name='password'
         value={props.formState.password}
         onChange={(e) => {
           e.persist();
           props.updateFormState(e);
         }}
         style={styles.input}
-        placeholder="password"
+        placeholder='password'
       />
       <input
-        name="given_name"
+        name='given_name'
         value={props.formState.given_name}
         onChange={(e) => {
           e.persist();
           props.updateFormState(e);
         }}
         style={styles.input}
-        placeholder="first name"
+        placeholder='first name'
       />
       <input
-        name="family_name"
+        name='family_name'
         value={props.formState.family_name}
         onChange={(e) => {
           e.persist();
           props.updateFormState(e);
         }}
         style={styles.input}
-        placeholder="last name"
+        placeholder='last name'
       />
       <button onClick={props.signUp} style={styles.button as any}>
         Sign Up
@@ -175,25 +243,25 @@ const SignIn: React.FC<any> = (props: any) => {
   return (
     <div style={styles.container as any}>
       <input
-        name="email"
+        name='email'
         value={props.formState.email}
         onChange={(e) => {
           e.persist();
           props.updateFormState(e);
         }}
         style={styles.input}
-        placeholder="email"
+        placeholder='email'
       />
       <input
-        type="password"
-        name="password"
+        type='password'
+        name='password'
         value={props.formState.password}
         onChange={(e) => {
           e.persist();
           props.updateFormState(e);
         }}
         style={styles.input}
-        placeholder="password"
+        placeholder='password'
       />
       <button style={styles.button as any} onClick={props.signIn}>
         Sign In
@@ -206,8 +274,8 @@ const ConfirmSignUp: React.FC<any> = (props: any) => {
   return (
     <div style={styles.container as any}>
       <input
-        name="confirmationCode"
-        placeholder="Confirmation Code"
+        name='confirmationCode'
+        placeholder='Confirmation Code'
         onChange={(e) => {
           e.persist();
           props.updateFormState(e);

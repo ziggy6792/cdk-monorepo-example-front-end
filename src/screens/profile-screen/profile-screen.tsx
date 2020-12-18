@@ -50,51 +50,6 @@ class ProfileScreen extends React.Component<Props, State> {
   }
 
   render() {
-    // const styles = {
-    //   appContainer: {
-    //     // paddingTop: 115,
-    //   },
-    //   loading: {},
-    //   button: {
-    //     marginTop: 15,
-    //     width: '100%',
-    //     maxWidth: 250,
-    //     marginBottom: 10,
-    //     display: 'flex',
-    //     justifyContent: 'flex-start',
-    //     alignItems: 'center',
-    //     padding: '0px 16px',
-    //     borderRadius: 2,
-    //     boxShadow: '0px 1px 3px rgba(0, 0, 0, .3)',
-    //     cursor: 'pointer',
-    //     outline: 'none',
-    //     border: 'none',
-    //     minHeight: 40,
-    //   },
-    //   text: {
-    //     color: 'white',
-    //     fontSize: 14,
-    //     marginLeft: 10,
-    //     fontWeight: 'bold',
-    //   },
-    //   signOut: {
-    //     backgroundColor: 'black',
-    //   },
-    //   footer: {
-    //     fontWeight: '600',
-    //     padding: '0px 25px',
-    //     textAlign: 'right',
-    //     color: 'rgba(0, 0, 0, 0.6)',
-    //   },
-    //   anchor: {
-    //     color: 'rgb(255, 153, 0)',
-    //     textDecoration: 'none',
-    //   },
-    //   body: {
-    //     padding: '0px 30px',
-    //   },
-    // };
-
     // This renders the custom form
     if (this.state.formState === 'email') {
       return <LoginForm />;
