@@ -50,57 +50,54 @@ class ProfileScreen extends React.Component<Props, State> {
   }
 
   render() {
-    const styles = {
-      appContainer: {
-        // paddingTop: 115,
-      },
-      loading: {},
-      button: {
-        marginTop: 15,
-        width: '100%',
-        maxWidth: 250,
-        marginBottom: 10,
-        display: 'flex',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        padding: '0px 16px',
-        borderRadius: 2,
-        boxShadow: '0px 1px 3px rgba(0, 0, 0, .3)',
-        cursor: 'pointer',
-        outline: 'none',
-        border: 'none',
-        minHeight: 40,
-      },
-      text: {
-        color: 'white',
-        fontSize: 14,
-        marginLeft: 10,
-        fontWeight: 'bold',
-      },
-      signOut: {
-        backgroundColor: 'black',
-      },
-      footer: {
-        fontWeight: '600',
-        padding: '0px 25px',
-        textAlign: 'right',
-        color: 'rgba(0, 0, 0, 0.6)',
-      },
-      anchor: {
-        color: 'rgb(255, 153, 0)',
-        textDecoration: 'none',
-      },
-      body: {
-        padding: '0px 30px',
-      },
-    };
+    // const styles = {
+    //   appContainer: {
+    //     // paddingTop: 115,
+    //   },
+    //   loading: {},
+    //   button: {
+    //     marginTop: 15,
+    //     width: '100%',
+    //     maxWidth: 250,
+    //     marginBottom: 10,
+    //     display: 'flex',
+    //     justifyContent: 'flex-start',
+    //     alignItems: 'center',
+    //     padding: '0px 16px',
+    //     borderRadius: 2,
+    //     boxShadow: '0px 1px 3px rgba(0, 0, 0, .3)',
+    //     cursor: 'pointer',
+    //     outline: 'none',
+    //     border: 'none',
+    //     minHeight: 40,
+    //   },
+    //   text: {
+    //     color: 'white',
+    //     fontSize: 14,
+    //     marginLeft: 10,
+    //     fontWeight: 'bold',
+    //   },
+    //   signOut: {
+    //     backgroundColor: 'black',
+    //   },
+    //   footer: {
+    //     fontWeight: '600',
+    //     padding: '0px 25px',
+    //     textAlign: 'right',
+    //     color: 'rgba(0, 0, 0, 0.6)',
+    //   },
+    //   anchor: {
+    //     color: 'rgb(255, 153, 0)',
+    //     textDecoration: 'none',
+    //   },
+    //   body: {
+    //     padding: '0px 30px',
+    //   },
+    // };
+
     // This renders the custom form
     if (this.state.formState === 'email') {
-      return (
-        <div style={styles.appContainer}>
-          <LoginForm />
-        </div>
-      );
+      return <LoginForm />;
     }
     if (!this.state.formState) {
       return <Spinner />;
@@ -110,29 +107,26 @@ class ProfileScreen extends React.Component<Props, State> {
 
     return (
       <>
-        <div style={styles.appContainer}>
-          {isAuthenticated && (
-            <>
-              <h4>Welcome {this.props.auth.user.nameDisplayText}</h4>
-              <button
-                style={{ ...styles.button, ...styles.signOut }}
-                onClick={async () => {
-                  // this.setState({ formState: null });
+        {isAuthenticated && (
+          <>
+            <h4>Welcome {this.props.auth.user.nameDisplayText}</h4>
+            <button
+              onClick={async () => {
+                // this.setState({ formState: null });
 
-                  // this.setState({ formState: null });
-                  this.props.client.cache.reset();
-                  await this.props.auth.onLogout();
-                }}
-              >
-                <FaSignOutAlt color="white" />
-                <p style={{ ...styles.text } as any}>Sign Out</p>
-              </button>
-            </>
-          )}
+                // this.setState({ formState: null });
+                this.props.client.cache.reset();
+                await this.props.auth.onLogout();
+              }}
+            >
+              <FaSignOutAlt color='white' />
+              <p>Sign Out</p>
+            </button>
+          </>
+        )}
 
-          {!isAuthenticated && <Buttons updateFormState={(newState: any) => this.setState((prevState) => ({ ...prevState, formState: newState }))} />}
-          {isAuthenticated && <div style={styles.body}>Is Authenticated</div>}
-        </div>
+        {!isAuthenticated && <Buttons updateFormState={(newState: any) => this.setState((prevState) => ({ ...prevState, formState: newState }))} />}
+        {isAuthenticated && <div>Is Authenticated</div>}
       </>
     );
   }
