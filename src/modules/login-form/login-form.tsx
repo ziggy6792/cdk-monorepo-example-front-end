@@ -12,15 +12,22 @@ import { TextField } from 'formik-material-ui';
 import { Button, Grid } from '@material-ui/core';
 import * as Yup from 'yup';
 
-interface IUser {
+interface ISignInOrUpFormValues {
   email: string;
   password: string;
   firstName: string;
   lastName: string;
 }
 
+const SignInOrUpFormValuesSchema = Yup.object().shape({
+  firstName: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Required'),
+  lastName: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Required'),
+  email: Yup.string().email('Invalid email').required('Required'),
+  password: Yup.string().min(6, 'Too Short!').required('Required'),
+});
+
 // eslint-disable-next-line camelcase
-async function signUp({ email, password, firstName, lastName }: IUser, updateFormType: (formType: string) => void) {
+async function signUp({ email, password, firstName, lastName }: ISignInOrUpFormValues, updateFormType: (formType: string) => void) {
   try {
     // const response = await Auth.signUp({
     //   username: email,
@@ -50,13 +57,6 @@ async function confirmSignUp({ email, confirmationCode }: ISignupConfirmation, u
   }
 }
 
-interface ISignInOUpFormValues {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-}
-
 const LoginForm: React.FC = () => {
   const [formType, updateFormType] = useState('signInOrUp');
   const [email, setEmail] = useState<string | null>(null);
@@ -66,11 +66,11 @@ const LoginForm: React.FC = () => {
       case 'signInOrUp':
         return (
           <SignUp
-            signUp={async (values: ISignInOUpFormValues) => {
+            signUp={async (values: ISignInOrUpFormValues) => {
               setEmail(values.email);
               signUp(values, updateFormType);
             }}
-            signIn={async (values: ISignInOUpFormValues) => {
+            signIn={async (values: ISignInOrUpFormValues) => {
               console.log('signIn', values);
             }}
           />
@@ -93,16 +93,9 @@ const LoginForm: React.FC = () => {
   return renderForm();
 };
 
-const SignupSchema = Yup.object().shape({
-  firstName: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Required'),
-  lastName: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Required'),
-  email: Yup.string().email('Invalid email').required('Required'),
-  password: Yup.string().min(6, 'Too Short!').required('Required'),
-});
-
 interface SignUpProps {
-  signUp: (formValues: ISignInOUpFormValues) => Promise<void>;
-  signIn: (formValues: ISignInOUpFormValues) => Promise<void>;
+  signUp: (formValues: ISignInOrUpFormValues) => Promise<void>;
+  signIn: (formValues: ISignInOrUpFormValues) => Promise<void>;
 }
 
 export const SignUp: React.FC<SignUpProps> = ({ signUp, signIn }) => {
@@ -115,7 +108,7 @@ export const SignUp: React.FC<SignUpProps> = ({ signUp, signIn }) => {
         lastName: 'Verhoeven',
         password: 'password',
       }}
-      validationSchema={SignupSchema}
+      validationSchema={SignInOrUpFormValuesSchema}
       onSubmit={async (values) => {
         if (isSignUp) {
           await signUp(values);
@@ -184,6 +177,9 @@ const ConfirmSignUp: React.FC<IConfirmSignupProps> = ({ onSubmit }) => {
       initialValues={{
         confirmationCode: '',
       }}
+      validationSchema={Yup.object().shape({
+        confirmationCode: Yup.string().length(6, 'Must Be 6 Characters!').required('Required'),
+      })}
       onSubmit={async (values) => {
         await onSubmit(values.confirmationCode);
       }}
