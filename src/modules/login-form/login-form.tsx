@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable no-alert */
 /* eslint-disable react/button-has-type */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
@@ -6,7 +7,7 @@ import React, { useState, useReducer } from 'react';
 
 import { Auth } from 'aws-amplify';
 import Logger from 'js-logger';
-import { Formik, Field } from 'formik';
+import { Formik, Field, useFormikContext } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { Button, Grid } from '@material-ui/core';
 import * as Yup from 'yup';
@@ -14,8 +15,8 @@ import * as Yup from 'yup';
 interface IUser {
   email: string;
   password: string;
-  given_name: string;
-  family_name: string;
+  firstName: string;
+  lastName: string;
 }
 
 const initialFormState = {
@@ -23,8 +24,8 @@ const initialFormState = {
   password: 'password',
   confirmationCode: '',
 
-  given_name: 'Simon',
-  family_name: 'Verhoeven',
+  firstName: 'Simon',
+  lastName: 'Verhoeven',
 };
 
 function reducer(state: any, action: any) {
@@ -40,17 +41,16 @@ function reducer(state: any, action: any) {
 }
 
 // eslint-disable-next-line camelcase
-async function signUp({ email, password, given_name, family_name }: IUser, updateFormType: (type: string) => void) {
+async function signUp({ email, password, firstName, lastName }: IUser) {
   try {
     const response = await Auth.signUp({
       username: email,
       password,
-      attributes: { email, 'custom:signUpAttributes': JSON.stringify({ given_name, family_name }) },
+      attributes: { email, 'custom:signUpAttributes': JSON.stringify({ given_name: firstName, family_name: lastName }) },
     });
     Logger.info(response.user);
 
     Logger.info('sign up success!');
-    updateFormType('confirmSignUp');
   } catch (err) {
     Logger.info('error signing up..', err);
   }
@@ -69,11 +69,21 @@ async function confirmSignUp({ email, confirmationCode }: { email: string; confi
 const LoginForm: React.FC<any> = () => {
   const [formType, updateFormType] = useState('signIn');
   const [formState, updateFormState] = useReducer(reducer, initialFormState);
+  // const { values } = useFormikContext();
+
+  // console.log('values', values);
 
   function renderForm() {
     switch (formType) {
-      case 'signUp':
-        return <SignUp signUp={() => signUp(formState, updateFormType)} />;
+      case 'signIn':
+        return (
+          <SignUp
+            signUp={(values: Values) => signUp(values)}
+            signIn={async (values: Values) => {
+              console.log('login', values);
+            }}
+          />
+        );
       case 'confirmSignUp':
         return (
           <ConfirmSignUp
@@ -82,42 +92,13 @@ const LoginForm: React.FC<any> = () => {
             formState={formState}
           />
         );
-      case 'signIn':
-        return (
-          <SignIn
-            signIn={() => {
-              console.log('login', { email: formState.email, password: formState.password });
-            }}
-            updateFormState={(e: any) => updateFormState({ type: 'updateFormState', e })}
-            formState={formState}
-          />
-        );
+
       default:
         return null;
     }
   }
 
-  return (
-    <div>
-      <div>{renderForm()}</div>
-      {formType === 'signUp' && (
-        <p style={styles.footer as any}>
-          Already have an profile?{' '}
-          <span style={styles.anchor} onClick={() => updateFormType('signIn')}>
-            Sign In
-          </span>
-        </p>
-      )}
-      {formType === 'signIn' && (
-        <p style={styles.footer as any}>
-          Need an profile?{' '}
-          <span style={styles.anchor} onClick={() => updateFormType('signUp')}>
-            Sign Up
-          </span>
-        </p>
-      )}
-    </div>
-  );
+  return renderForm();
 };
 
 const SignupSchema = Yup.object().shape({
@@ -135,33 +116,27 @@ interface Values {
 }
 
 interface SignUpProps {
-  signUp: () => Promise<void>;
+  signUp: (formValues: Values) => Promise<void>;
+  signIn: (formValues: Values) => Promise<void>;
 }
 
-export const SignUp: React.FC<SignUpProps> = () => {
+export const SignUp: React.FC<SignUpProps> = ({ signUp, signIn }) => {
+  const [isSignUp, setIsSignUp] = useState(true);
   return (
     <Formik
       initialValues={{
-        email: '',
-        firstName: '',
-        lastName: '',
-        password: '',
+        email: 'ziggy067@gmail.com',
+        firstName: 'Simon',
+        lastName: 'Verhoeven',
+        password: 'password',
       }}
       validationSchema={SignupSchema}
-      validate={(values) => {
-        const errors: Partial<Values> = {};
-        if (!values.email) {
-          errors.email = 'Required';
-        } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
-          errors.email = 'Invalid email address';
+      onSubmit={async (values) => {
+        if (isSignUp) {
+          await signUp(values);
+        } else {
+          await signIn(values);
         }
-        return errors;
-      }}
-      onSubmit={(values, { setSubmitting }) => {
-        setTimeout(() => {
-          setSubmitting(false);
-          alert(JSON.stringify(values, null, 2));
-        }, 500);
       }}
     >
       {({ submitForm, isSubmitting }) => (
@@ -172,17 +147,42 @@ export const SignUp: React.FC<SignUpProps> = () => {
           <Grid item>
             <Field component={TextField} type='password' label='Password' name='password' />
           </Grid>
-          <Grid item>
-            <Field component={TextField} name='firstName' label='First Name' />
-          </Grid>
-          <Grid item>
-            <Field component={TextField} name='lastName' label='Last Name' />
-          </Grid>
-          <Grid item>
-            <Button variant='contained' color='primary' disabled={isSubmitting} onClick={submitForm}>
-              Sign Up
-            </Button>
-          </Grid>
+          {isSignUp && (
+            <>
+              <Grid item>
+                <Field component={TextField} name='firstName' label='First Name' />
+              </Grid>
+              <Grid item>
+                <Field component={TextField} name='lastName' label='Last Name' />
+              </Grid>
+              <Grid item>
+                <Button variant='contained' color='primary' disabled={isSubmitting} onClick={submitForm}>
+                  Sign Up
+                </Button>
+              </Grid>
+              <Grid item>
+                Have a Pofile?{' '}
+                <Button color='primary' onClick={() => setIsSignUp((isu) => !isu)}>
+                  Sign In
+                </Button>
+              </Grid>
+            </>
+          )}
+          {!isSignUp && (
+            <>
+              <Grid item>
+                <Button variant='contained' color='primary' disabled={isSubmitting} onClick={submitForm}>
+                  Sign In
+                </Button>
+              </Grid>
+              <Grid item>
+                Need a Pofile?{' '}
+                <Button color='primary' onClick={() => setIsSignUp((isu) => !isu)}>
+                  Sign Up
+                </Button>
+              </Grid>
+            </>
+          )}
         </Grid>
       )}
     </Formik>
@@ -214,8 +214,8 @@ const OldSignUp: React.FC<any> = (props: any) => {
         placeholder='password'
       />
       <input
-        name='given_name'
-        value={props.formState.given_name}
+        name='firstName'
+        value={props.formState.firstName}
         onChange={(e) => {
           e.persist();
           props.updateFormState(e);
@@ -224,8 +224,8 @@ const OldSignUp: React.FC<any> = (props: any) => {
         placeholder='first name'
       />
       <input
-        name='family_name'
-        value={props.formState.family_name}
+        name='lastName'
+        value={props.formState.lastName}
         onChange={(e) => {
           e.persist();
           props.updateFormState(e);
