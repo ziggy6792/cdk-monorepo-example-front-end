@@ -1,8 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Logger from 'js-logger';
 import App from './app';
 import reportWebVitals from './reportWebVitals';
 import './index.css';
+
+Logger.setLevel(Logger.INFO);
+// eslint-disable-next-line react-hooks/rules-of-hooks
+Logger.useDefaults();
 
 ReactDOM.render(
   <React.StrictMode>

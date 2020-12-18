@@ -7,7 +7,7 @@ import React, { useState, useReducer } from 'react';
 
 import { Auth } from 'aws-amplify';
 import Logger from 'js-logger';
-import { Formik, Field, useFormikContext } from 'formik';
+import { Formik, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { Button, Grid } from '@material-ui/core';
 import * as Yup from 'yup';
@@ -19,78 +19,70 @@ interface IUser {
   lastName: string;
 }
 
-const initialFormState = {
-  email: 'ziggy067+1@gmail.com',
-  password: 'password',
-  confirmationCode: '',
-
-  firstName: 'Simon',
-  lastName: 'Verhoeven',
-};
-
-function reducer(state: any, action: any) {
-  switch (action.type) {
-    case 'updateFormState':
-      return {
-        ...state,
-        [action.e.target.name]: action.e.target.value,
-      };
-    default:
-      return state;
-  }
-}
-
 // eslint-disable-next-line camelcase
-async function signUp({ email, password, firstName, lastName }: IUser) {
+async function signUp({ email, password, firstName, lastName }: IUser, updateFormType: (formType: string) => void) {
   try {
-    const response = await Auth.signUp({
-      username: email,
-      password,
-      attributes: { email, 'custom:signUpAttributes': JSON.stringify({ given_name: firstName, family_name: lastName }) },
-    });
-    Logger.info(response.user);
-
+    // const response = await Auth.signUp({
+    //   username: email,
+    //   password,
+    //   attributes: { email, 'custom:signUpAttributes': JSON.stringify({ given_name: firstName, family_name: lastName }) },
+    // });
+    // Logger.info(response.user);
     Logger.info('sign up success!');
+    updateFormType('confirmSignUp');
   } catch (err) {
     Logger.info('error signing up..', err);
   }
 }
 
-async function confirmSignUp({ email, confirmationCode }: { email: string; confirmationCode: string }, updateFormType: (type: string) => void) {
+interface ISignupConfirmation {
+  email: string;
+  confirmationCode: string;
+}
+
+async function confirmSignUp({ email, confirmationCode }: ISignupConfirmation, updateFormType: (type: string) => void) {
   try {
     await Auth.confirmSignUp(email, confirmationCode);
     Logger.info('confirm sign up success!');
-    updateFormType('signIn');
+    updateFormType('signInOrUp');
   } catch (err) {
     Logger.info('error signing up..', err);
   }
 }
 
-const LoginForm: React.FC<any> = () => {
-  const [formType, updateFormType] = useState('signIn');
-  const [formState, updateFormState] = useReducer(reducer, initialFormState);
-  // const { values } = useFormikContext();
+interface ISignInOUpFormValues {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
 
-  // console.log('values', values);
+const LoginForm: React.FC = () => {
+  const [formType, updateFormType] = useState('signInOrUp');
+  const [email, setEmail] = useState<string | null>(null);
 
   function renderForm() {
     switch (formType) {
-      case 'signIn':
+      case 'signInOrUp':
         return (
           <SignUp
-            signUp={(values: Values) => signUp(values)}
-            signIn={async (values: Values) => {
-              console.log('login', values);
+            signUp={async (values: ISignInOUpFormValues) => {
+              setEmail(values.email);
+              signUp(values, updateFormType);
+            }}
+            signIn={async (values: ISignInOUpFormValues) => {
+              console.log('signIn', values);
             }}
           />
         );
       case 'confirmSignUp':
         return (
-          <ConfirmSignUp
-            confirmSignUp={() => confirmSignUp(formState, updateFormType)}
-            updateFormState={(e: any) => updateFormState({ type: 'updateFormState', e })}
-            formState={formState}
-          />
+          // <ConfirmSignUp
+          //   confirmSignUp={() => confirmSignUp(formState, updateFormType)}
+          //   updateFormState={(e: any) => updateFormState({ type: 'updateFormState', e })}
+          //   formState={formState}
+          // />
+          <ConfirmSignUp confirmSignUp={(confirmationCode: string) => confirmSignUp({ email, confirmationCode }, updateFormType)} />
         );
 
       default:
@@ -108,16 +100,9 @@ const SignupSchema = Yup.object().shape({
   password: Yup.string().min(6, 'Too Short!').required('Required'),
 });
 
-interface Values {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-}
-
 interface SignUpProps {
-  signUp: (formValues: Values) => Promise<void>;
-  signIn: (formValues: Values) => Promise<void>;
+  signUp: (formValues: ISignInOUpFormValues) => Promise<void>;
+  signIn: (formValues: ISignInOUpFormValues) => Promise<void>;
 }
 
 export const SignUp: React.FC<SignUpProps> = ({ signUp, signIn }) => {
@@ -189,149 +174,28 @@ export const SignUp: React.FC<SignUpProps> = ({ signUp, signIn }) => {
   );
 };
 
-const OldSignUp: React.FC<any> = (props: any) => {
-  return (
-    <div style={styles.container as any}>
-      <input
-        name='email'
-        value={props.formState.email}
-        onChange={(e) => {
-          e.persist();
-          props.updateFormState(e);
-        }}
-        style={styles.input}
-        placeholder='email'
-      />
-      <input
-        type='password'
-        name='password'
-        value={props.formState.password}
-        onChange={(e) => {
-          e.persist();
-          props.updateFormState(e);
-        }}
-        style={styles.input}
-        placeholder='password'
-      />
-      <input
-        name='firstName'
-        value={props.formState.firstName}
-        onChange={(e) => {
-          e.persist();
-          props.updateFormState(e);
-        }}
-        style={styles.input}
-        placeholder='first name'
-      />
-      <input
-        name='lastName'
-        value={props.formState.lastName}
-        onChange={(e) => {
-          e.persist();
-          props.updateFormState(e);
-        }}
-        style={styles.input}
-        placeholder='last name'
-      />
-      <button onClick={props.signUp} style={styles.button as any}>
-        Sign Up
-      </button>
-    </div>
-  );
-};
-const SignIn: React.FC<any> = (props: any) => {
-  return (
-    <div style={styles.container as any}>
-      <input
-        name='email'
-        value={props.formState.email}
-        onChange={(e) => {
-          e.persist();
-          props.updateFormState(e);
-        }}
-        style={styles.input}
-        placeholder='email'
-      />
-      <input
-        type='password'
-        name='password'
-        value={props.formState.password}
-        onChange={(e) => {
-          e.persist();
-          props.updateFormState(e);
-        }}
-        style={styles.input}
-        placeholder='password'
-      />
-      <button style={styles.button as any} onClick={props.signIn}>
-        Sign In
-      </button>
-    </div>
-  );
-};
+interface IConfirmSignupProps {
+  confirmSignUp: (confirmationCode: string) => Promise<void>;
+}
 
-const ConfirmSignUp: React.FC<any> = (props: any) => {
+const ConfirmSignUp: React.FC<IConfirmSignupProps> = () => {
   return (
-    <div style={styles.container as any}>
-      <input
-        name='confirmationCode'
-        placeholder='Confirmation Code'
-        onChange={(e) => {
-          e.persist();
-          props.updateFormState(e);
-        }}
-        style={styles.input}
-      />
-      <button onClick={props.confirmSignUp} style={styles.button as any}>
-        Confirm Sign Up
-      </button>
-    </div>
+    // <div style={styles.container as any}>
+    //   <input
+    //     name='confirmationCode'
+    //     placeholder='Confirmation Code'
+    //     onChange={(e) => {
+    //       e.persist();
+    //       props.updateFormState(e);
+    //     }}
+    //     style={styles.input}
+    //   />
+    //   <button onClick={props.confirmSignUp} style={styles.button as any}>
+    //     Confirm Sign Up
+    //   </button>
+    // </div>
+    <div>confitm sign up</div>
   );
-};
-
-const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    marginTop: 150,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  input: {
-    height: 45,
-    marginTop: 8,
-    width: 300,
-    maxWidth: 300,
-    padding: '0px 8px',
-    fontSize: 16,
-    outline: 'none',
-    border: 'none',
-    borderBottom: '2px solid rgba(0, 0, 0, .3)',
-  },
-  button: {
-    backgroundColor: '#006bfc',
-    color: 'white',
-    width: 316,
-    height: 45,
-    marginTop: 10,
-    fontWeight: '600',
-    fontSize: 14,
-    cursor: 'pointer',
-    border: 'none',
-    outline: 'none',
-    borderRadius: 3,
-    boxShadow: '0px 1px 3px rgba(0, 0, 0, .3)',
-  },
-  footer: {
-    fontWeight: '600',
-    padding: '0px 25px',
-    textAlign: 'center',
-    color: 'rgba(0, 0, 0, 0.6)',
-  },
-  anchor: {
-    color: '#006bfc',
-    cursor: 'pointer',
-  },
 };
 
 export default LoginForm;
