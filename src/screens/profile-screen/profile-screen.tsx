@@ -34,10 +34,10 @@ class ProfileScreen extends React.Component<Props, State> {
       //     this.setState({ formState: null });
       //   });
       // }
-      if (payload.event !== 'signUp') {
-        this.setState({ formState: null });
-        window.location.reload(false);
-      }
+      // if (payload.event !== 'signUp') {
+      //   this.setState({ formState: null });
+      //   window.location.reload(false);
+      // }
     };
   }
 

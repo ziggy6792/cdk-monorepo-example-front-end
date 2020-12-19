@@ -15,6 +15,14 @@ interface IFormState {
   confirmationCode: string;
 }
 
+const initialFormValues = {
+  email: 'ziggy067@gmail.com',
+  firstName: 'Simon',
+  lastName: 'Verhoeven',
+  password: 'password',
+  confirmationCode: '',
+};
+
 const signInSchema = {
   firstName: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Required'),
   lastName: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Required'),
@@ -33,12 +41,12 @@ const confirmSchema = {
 // eslint-disable-next-line camelcase
 async function signUp({ email, password, firstName, lastName }: IFormState) {
   try {
-    // const response = await Auth.signUp({
-    //   username: email,
-    //   password,
-    //   attributes: { email, 'custom:signUpAttributes': JSON.stringify({ given_name: firstName, family_name: lastName }) },
-    // });
-    // Logger.info(response.user);
+    const response = await Auth.signUp({
+      username: email,
+      password,
+      attributes: { email, 'custom:signUpAttributes': JSON.stringify({ given_name: firstName, family_name: lastName }) },
+    });
+    Logger.info(response.user);
     Logger.info('sign up success!');
   } catch (err) {
     Logger.info('error signing up..', err);
@@ -63,7 +71,7 @@ async function confirmSignUp({ email, confirmationCode }: ISignupConfirmation) {
 
 const LoginForm: React.FC = () => {
   return (
-    <Form
+    <MainForm
       onSignUp={async (values: IFormState) => {
         signUp(values);
       }}
@@ -75,20 +83,12 @@ const LoginForm: React.FC = () => {
   );
 };
 
-const initialFormValues = {
-  email: 'ziggy067@gmail.com',
-  firstName: 'Simon',
-  lastName: 'Verhoeven',
-  password: 'password',
-  confirmationCode: '',
-};
-
 type SubmitFormFunction = (formValues: IFormState) => Promise<void>;
 
 enum FormType {
   SIGN_IN = 'SIGN_IN',
   SIGN_UP = 'SIGN_UP',
-  CONFIRM = 'SIGN_CONFIRM',
+  CONFIRM = 'CONFIRM',
 }
 
 interface SubFormProps {
@@ -170,7 +170,7 @@ interface FormProps {
   onConfirm: SubmitFormFunction;
 }
 
-export const Form: React.FC<FormProps> = ({ onSignIn, onSignUp, onConfirm }) => {
+export const MainForm: React.FC<FormProps> = ({ onSignIn, onSignUp, onConfirm }) => {
   const [formType, setFormType] = useState<FormType>(FormType.SIGN_IN);
 
   let onSubmit: SubmitFormFunction;
