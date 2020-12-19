@@ -43,7 +43,7 @@ export const client = new ApolloClient({
   link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
   typeDefs,
-  resolvers,
+  resolvers: resolvers as any,
 });
 
 const App = () => (

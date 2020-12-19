@@ -1,4 +1,5 @@
-import { useReducer, useState, useEffect } from 'react';
+/* eslint-disable import/prefer-default-export */
+import React, { useReducer, useState, useEffect } from 'react';
 import { Auth, Hub } from 'aws-amplify';
 
 const amplifyAuthReducer = (state, action) => {
@@ -25,7 +26,24 @@ const amplifyAuthReducer = (state, action) => {
   }
 };
 
-const useAmplifyAuth = () => {
+interface IAuthState {
+  isLoading: boolean;
+  isError: boolean;
+  user: any;
+}
+
+interface IAuthState {
+  isLoading: boolean;
+  isError: boolean;
+  user: any;
+}
+
+interface IUseAmplifyAuth {
+  state: IAuthState;
+  handleSignout: () => Promise<void>;
+}
+
+const useAmplifyAuth = (): IUseAmplifyAuth => {
   const initialState = {
     isLoading: true,
     isError: false,
@@ -50,6 +68,7 @@ const useAmplifyAuth = () => {
               payload: { user: data },
             });
           }
+          localStorage.setItem('User', data);
         }
       } catch (error) {
         if (isMounted) {
@@ -92,6 +111,7 @@ const useAmplifyAuth = () => {
       await Auth.signOut();
       setTriggerFetch(false);
       dispatch({ type: 'RESET_USER_DATA' });
+      localStorage.setItem('User', null);
     } catch (error) {
       console.error('Error signing out user ', error);
     }
