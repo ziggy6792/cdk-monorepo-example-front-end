@@ -117,6 +117,18 @@ const useAmplifyAuth = (): IUseAmplifyAuth => {
     }
   };
 
+  // const handleSignIn = async () => {
+  //   try {
+  //     console.log('signed out');
+  //     await Auth.signOut();
+  //     setTriggerFetch(false);
+  //     dispatch({ type: 'RESET_USER_DATA' });
+  //     localStorage.setItem('User', null);
+  //   } catch (error) {
+  //     console.error('Error signing out user ', error);
+  //   }
+  // };
+
   return { state, handleSignout };
 };
 

@@ -16,7 +16,7 @@ interface IFormState {
 }
 
 const initialFormValues = {
-  email: 'ziggy067@gmail.com',
+  email: 'ziggy067+9@gmail.com',
   firstName: 'Simon',
   lastName: 'Verhoeven',
   password: 'password',
@@ -53,6 +53,16 @@ async function signUp({ email, password, firstName, lastName }: IFormState) {
   }
 }
 
+async function signIn({ email, password }: IFormState) {
+  try {
+    const response = await Auth.signIn(email, password);
+    Logger.info(response.user);
+    Logger.info('sign up success!');
+  } catch (err) {
+    Logger.info('error signing up..', err);
+  }
+}
+
 interface ISignupConfirmation {
   email: string;
   confirmationCode: string;
@@ -76,7 +86,7 @@ const LoginForm: React.FC = () => {
         signUp(values);
       }}
       onSignIn={async (values: IFormState) => {
-        Logger.info('signIn', values);
+        signIn(values);
       }}
       onConfirm={async ({ email, confirmationCode }: IFormState) => confirmSignUp({ email, confirmationCode })}
     />
