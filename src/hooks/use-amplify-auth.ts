@@ -1,41 +1,49 @@
 /* eslint-disable import/prefer-default-export */
-import React, { useReducer, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Auth, Hub } from 'aws-amplify';
+import { CognitoUser } from '@aws-amplify/auth';
+import { useImmerReducer } from 'use-immer';
 
-const amplifyAuthReducer = (state, action) => {
+const amplifyAuthReducer = (state: IAuthState, action: IAction) => {
   switch (action.type) {
     case 'FETCH_USER_DATA_INIT':
-      return {
-        ...state,
-        isLoading: true,
-        isError: false,
-      };
+      state.isLoading = true;
+      state.isError = true;
+      return state;
+
     case 'FETCH_USER_DATA_SUCCESS':
-      return {
-        ...state,
-        isLoading: false,
-        isError: false,
-        user: action.payload.user,
-      };
+      state.isLoading = false;
+      state.isError = false;
+      state.user = action.payload.user;
+      return state;
     case 'FETCH_USER_DATA_FAILURE':
-      return { ...state, isLoading: false, isError: true };
+      state.isLoading = false;
+      state.isError = true;
+
+      return state;
     case 'RESET_USER_DATA':
-      return { ...state, user: null };
+      state.user = null;
+      return state;
     default:
       throw new Error();
   }
 };
 
-interface IAuthState {
-  isLoading: boolean;
-  isError: boolean;
-  user: any;
+interface IAction {
+  type: string;
+  payload?: { user: CognitoUser };
 }
 
 interface IAuthState {
   isLoading: boolean;
   isError: boolean;
-  user: any;
+  user: CognitoUser | null;
+}
+
+interface IAuthState {
+  isLoading: boolean;
+  isError: boolean;
+  user: CognitoUser;
 }
 
 interface IUseAmplifyAuth {
@@ -49,7 +57,7 @@ const useAmplifyAuth = (): IUseAmplifyAuth => {
     isError: false,
     user: null,
   };
-  const [state, dispatch] = useReducer(amplifyAuthReducer, initialState);
+  const [state, dispatch] = useImmerReducer(amplifyAuthReducer, initialState);
   const [triggerFetch, setTriggerFetch] = useState(false);
 
   useEffect(() => {
@@ -103,7 +111,7 @@ const useAmplifyAuth = (): IUseAmplifyAuth => {
       Hub.remove('auth', () => {});
       isMounted = false;
     };
-  }, [triggerFetch]);
+  }, [triggerFetch, dispatch]);
 
   const handleSignout = async () => {
     try {

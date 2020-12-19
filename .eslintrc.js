@@ -32,6 +32,7 @@ module.exports = {
     // quotes: [2, 'single', { avoidEscape: true }],
     'react/destructuring-assignment': 'off',
     '@typescript-eslint/no-use-before-define': 'off',
+    'no-param-reassign': 'off',
     'react/prop-types': 'off',
     'linebreak-style': 'off',
     'prettier/prettier': [
