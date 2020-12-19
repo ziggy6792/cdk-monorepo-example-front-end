@@ -10,7 +10,7 @@ const Routes = () => {
   return (
     <ThemeProvider theme={Theme}>
       <BrowserRouter>
-        <Route exact path="/">
+        <Route exact path='/'>
           <Redirect to={ROUTE_PROFILE} />
         </Route>
         <Switch>
