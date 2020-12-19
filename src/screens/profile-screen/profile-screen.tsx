@@ -20,7 +20,7 @@ const ProfileScreen: React.FC = () => {
 
   // const [value, toggleValue] = useToggle(true);
 
-  const { state, handleSignout, handleSignIn } = useAmplifyAuth();
+  const { state, handleSignout } = useAmplifyAuth();
 
   const { isLoading, user, isGuest } = state;
 
@@ -36,7 +36,7 @@ const ProfileScreen: React.FC = () => {
     <>
       {!isAuthenticated && (
         <>
-          {formState === 'email' && <LoginForm onLogin={handleSignIn} />}
+          {formState === 'email' && <LoginForm />}
           {formState === 'base' && <Buttons updateFormState={setFormSate} />}
         </>
       )}

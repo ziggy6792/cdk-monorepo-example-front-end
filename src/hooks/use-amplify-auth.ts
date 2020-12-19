@@ -77,6 +77,7 @@ const useAmplifyAuth = (): IUseAmplifyAuth => {
 
   const handleSignIn = useCallback(async ({ email, password }: ILoginParams) => {
     const user = await Auth.signIn(email, password);
+    console.log('Sign in done');
     setTriggerFetch(false);
   }, []);
 

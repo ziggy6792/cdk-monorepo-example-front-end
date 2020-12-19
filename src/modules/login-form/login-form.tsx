@@ -6,6 +6,7 @@ import { Formik, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { Button, Grid } from '@material-ui/core';
 import * as Yup from 'yup';
+import useAmplifyAuth from '../../hooks/use-amplify-auth';
 
 interface IFormState {
   email: string;
@@ -79,18 +80,15 @@ async function confirmSignUp({ email, confirmationCode }: ISignupConfirmation) {
   }
 }
 
-interface LoginFormProps {
-  onLogin: ({ email, password }) => Promise<void>;
-}
-
-const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
+const LoginForm: React.FC = () => {
+  const { handleSignIn } = useAmplifyAuth();
   return (
     <MainForm
       onSignUp={async (values: IFormState) => {
         signUp(values);
       }}
       onSignIn={async (values: IFormState) => {
-        onLogin(values);
+        handleSignIn(values);
       }}
       onConfirm={async ({ email, confirmationCode }: IFormState) => confirmSignUp({ email, confirmationCode })}
     />
@@ -194,7 +192,10 @@ export const MainForm: React.FC<FormProps> = ({ onSignIn, onSignUp, onConfirm })
 
   switch (formType) {
     case FormType.SIGN_IN:
-      onSubmit = async (values: IFormState) => onSignIn(values);
+      onSubmit = async (values: IFormState) => {
+        await onSignIn(values);
+        const bla = 1 + 2;
+      };
       validationSchema = signInSchema;
       break;
     case FormType.SIGN_UP:
@@ -218,8 +219,13 @@ export const MainForm: React.FC<FormProps> = ({ onSignIn, onSignUp, onConfirm })
     <Formik
       initialValues={initialFormValues}
       validationSchema={Yup.object().shape(validationSchema)}
-      onSubmit={async (values) => {
+      onSubmit={async (values, { setSubmitting }) => {
+        setSubmitting(true);
+        console.log('start');
         await onSubmit(values);
+        console.log('end');
+
+        setSubmitting(false);
       }}
     >
       {({ submitForm, isSubmitting }) => (
