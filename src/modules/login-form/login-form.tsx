@@ -1,9 +1,4 @@
-/* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable no-alert */
-/* eslint-disable react/button-has-type */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-import React, { useState, useReducer } from 'react';
+import React, { useState } from 'react';
 
 import { Auth } from 'aws-amplify';
 import Logger from 'js-logger';
@@ -12,22 +7,31 @@ import { TextField } from 'formik-material-ui';
 import { Button, Grid } from '@material-ui/core';
 import * as Yup from 'yup';
 
-interface ISignInOrUpFormValues {
+interface IFormState {
   email: string;
   password: string;
   firstName: string;
   lastName: string;
+  confirmationCode: string;
 }
 
-const SignInOrUpFormValuesSchema = Yup.object().shape({
+const signInSchema = {
   firstName: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Required'),
   lastName: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Required'),
+};
+
+const signUpSchema = {
+  ...signInSchema,
   email: Yup.string().email('Invalid email').required('Required'),
   password: Yup.string().min(6, 'Too Short!').required('Required'),
-});
+};
+
+const confirmSchema = {
+  confirmationCode: Yup.string().length(6, 'Must Be 6 Characters!').required('Required'),
+};
 
 // eslint-disable-next-line camelcase
-async function signUp({ email, password, firstName, lastName }: ISignInOrUpFormValues, updateFormType: (formType: string) => void) {
+async function signUp({ email, password, firstName, lastName }: IFormState) {
   try {
     // const response = await Auth.signUp({
     //   username: email,
@@ -36,7 +40,6 @@ async function signUp({ email, password, firstName, lastName }: ISignInOrUpFormV
     // });
     // Logger.info(response.user);
     Logger.info('sign up success!');
-    updateFormType('confirmSignUp');
   } catch (err) {
     Logger.info('error signing up..', err);
   }
@@ -47,154 +50,169 @@ interface ISignupConfirmation {
   confirmationCode: string;
 }
 
-async function confirmSignUp({ email, confirmationCode }: ISignupConfirmation, updateFormType: (type: string) => void) {
+async function confirmSignUp({ email, confirmationCode }: ISignupConfirmation) {
   try {
+    Logger.info('confirm', { email, confirmationCode });
+
     await Auth.confirmSignUp(email, confirmationCode);
     Logger.info('confirm sign up success!');
-    updateFormType('signInOrUp');
   } catch (err) {
     Logger.info('error signing up..', err);
   }
 }
 
 const LoginForm: React.FC = () => {
-  const [formType, updateFormType] = useState('signInOrUp');
-  const [email, setEmail] = useState<string | null>(null);
-
-  function renderForm() {
-    switch (formType) {
-      case 'signInOrUp':
-        return (
-          <SignUp
-            signUp={async (values: ISignInOrUpFormValues) => {
-              setEmail(values.email);
-              signUp(values, updateFormType);
-            }}
-            signIn={async (values: ISignInOrUpFormValues) => {
-              console.log('signIn', values);
-            }}
-          />
-        );
-      case 'confirmSignUp':
-        return (
-          // <ConfirmSignUp
-          //   confirmSignUp={() => confirmSignUp(formState, updateFormType)}
-          //   updateFormState={(e: any) => updateFormState({ type: 'updateFormState', e })}
-          //   formState={formState}
-          // />
-          <ConfirmSignUp onSubmit={(confirmationCode: string) => confirmSignUp({ email, confirmationCode }, updateFormType)} />
-        );
-
-      default:
-        return null;
-    }
-  }
-
-  return renderForm();
-};
-
-interface SignUpProps {
-  signUp: (formValues: ISignInOrUpFormValues) => Promise<void>;
-  signIn: (formValues: ISignInOrUpFormValues) => Promise<void>;
-}
-
-export const SignUp: React.FC<SignUpProps> = ({ signUp, signIn }) => {
-  const [isSignUp, setIsSignUp] = useState(true);
   return (
-    <Formik
-      initialValues={{
-        email: 'ziggy067@gmail.com',
-        firstName: 'Simon',
-        lastName: 'Verhoeven',
-        password: 'password',
+    <Form
+      onSignUp={async (values: IFormState) => {
+        signUp(values);
       }}
-      validationSchema={SignInOrUpFormValuesSchema}
-      onSubmit={async (values) => {
-        if (isSignUp) {
-          await signUp(values);
-        } else {
-          await signIn(values);
-        }
+      onSignIn={async (values: IFormState) => {
+        Logger.info('signIn', values);
       }}
-    >
-      {({ submitForm, isSubmitting }) => (
-        <Grid container direction='column'>
-          <Grid item>
-            <Field component={TextField} name='email' type='email' label='Email' />
-          </Grid>
-          <Grid item>
-            <Field component={TextField} type='password' label='Password' name='password' />
-          </Grid>
-          {isSignUp && (
-            <>
-              <Grid item>
-                <Field component={TextField} name='firstName' label='First Name' />
-              </Grid>
-              <Grid item>
-                <Field component={TextField} name='lastName' label='Last Name' />
-              </Grid>
-              <Grid item>
-                <Button variant='contained' color='primary' disabled={isSubmitting} onClick={submitForm}>
-                  Sign Up
-                </Button>
-              </Grid>
-              <Grid item>
-                Have a Pofile?{' '}
-                <Button color='primary' onClick={() => setIsSignUp((isu) => !isu)}>
-                  Sign In
-                </Button>
-              </Grid>
-            </>
-          )}
-          {!isSignUp && (
-            <>
-              <Grid item>
-                <Button variant='contained' color='primary' disabled={isSubmitting} onClick={submitForm}>
-                  Sign In
-                </Button>
-              </Grid>
-              <Grid item>
-                Need a Pofile?{' '}
-                <Button color='primary' onClick={() => setIsSignUp((isu) => !isu)}>
-                  Sign Up
-                </Button>
-              </Grid>
-            </>
-          )}
-        </Grid>
-      )}
-    </Formik>
+      onConfirm={async ({ email, confirmationCode }: IFormState) => confirmSignUp({ email, confirmationCode })}
+    />
   );
 };
 
-interface IConfirmSignupProps {
-  onSubmit: (confirmationCode: string) => Promise<void>;
+const initialFormValues = {
+  email: 'ziggy067@gmail.com',
+  firstName: 'Simon',
+  lastName: 'Verhoeven',
+  password: 'password',
+  confirmationCode: '',
+};
+
+type SubmitFormFunction = (formValues: IFormState) => Promise<void>;
+
+enum FormType {
+  SIGN_IN = 'SIGN_IN',
+  SIGN_UP = 'SIGN_UP',
+  CONFIRM = 'SIGN_CONFIRM',
 }
 
-const ConfirmSignUp: React.FC<IConfirmSignupProps> = ({ onSubmit }) => {
+interface SubFormProps {
+  setFormType: (formType: FormType) => void;
+  isSubmitting: boolean;
+  submitForm: () => Promise<void>;
+}
+
+const SignInForm: React.FC<SubFormProps> = ({ setFormType, isSubmitting, submitForm }) => (
+  <Grid item>
+    <Grid item>
+      <Field component={TextField} name='email' type='email' label='Email' />
+    </Grid>
+    <Grid item>
+      <Field component={TextField} type='password' label='Password' name='password' />
+    </Grid>
+    <Grid item>
+      <Grid item>
+        <Button variant='contained' color='primary' disabled={isSubmitting} onClick={submitForm}>
+          Sign In
+        </Button>
+      </Grid>
+      <Grid item>
+        Need a Pofile?{' '}
+        <Button color='primary' onClick={() => setFormType(FormType.SIGN_UP)}>
+          Sign Up
+        </Button>
+      </Grid>
+    </Grid>
+  </Grid>
+);
+
+const SignUpForm: React.FC<SubFormProps> = ({ setFormType, isSubmitting, submitForm }) => (
+  <Grid item>
+    <Grid item>
+      <Field component={TextField} name='email' type='email' label='Email' />
+    </Grid>
+    <Grid item>
+      <Field component={TextField} type='password' label='Password' name='password' />
+    </Grid>
+    <Grid item>
+      <Field component={TextField} name='firstName' label='First Name' />
+    </Grid>
+    <Grid item>
+      <Field component={TextField} name='lastName' label='Last Name' />
+    </Grid>
+    <Grid item>
+      <Grid item>
+        <Button variant='contained' color='primary' disabled={isSubmitting} onClick={submitForm}>
+          Sign Up
+        </Button>
+      </Grid>
+      <Grid item>
+        Have a Pofile?{' '}
+        <Button color='primary' onClick={() => setFormType(FormType.SIGN_IN)}>
+          Sign In
+        </Button>
+      </Grid>
+    </Grid>
+  </Grid>
+);
+
+const ConfirimForm: React.FC<SubFormProps> = ({ isSubmitting, submitForm }) => (
+  <Grid item>
+    <Grid item>
+      <Field component={TextField} name='confirmationCode' label='Confirmation Code' />
+    </Grid>
+
+    <Grid item>
+      <Button variant='contained' color='primary' disabled={isSubmitting} onClick={submitForm}>
+        Confirm Sign Up
+      </Button>
+    </Grid>
+  </Grid>
+);
+interface FormProps {
+  onSignIn: SubmitFormFunction;
+  onSignUp: SubmitFormFunction;
+  onConfirm: SubmitFormFunction;
+}
+
+export const Form: React.FC<FormProps> = ({ onSignIn, onSignUp, onConfirm }) => {
+  const [formType, setFormType] = useState<FormType>(FormType.SIGN_IN);
+
+  let onSubmit: SubmitFormFunction;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let validationSchema: any = {};
+
+  switch (formType) {
+    case FormType.SIGN_IN:
+      onSubmit = async (values: IFormState) => onSignIn(values);
+      validationSchema = signInSchema;
+      break;
+    case FormType.SIGN_UP:
+      onSubmit = async (values: IFormState) => {
+        await onSignUp(values);
+        setFormType(FormType.CONFIRM);
+      };
+      validationSchema = signUpSchema;
+      break;
+    case FormType.CONFIRM:
+      onSubmit = async (values: IFormState) => {
+        await onConfirm(values);
+        setFormType(FormType.SIGN_IN);
+      };
+      validationSchema = confirmSchema;
+      break;
+    default:
+  }
+
   return (
     <Formik
-      initialValues={{
-        confirmationCode: '',
-      }}
-      validationSchema={Yup.object().shape({
-        confirmationCode: Yup.string().length(6, 'Must Be 6 Characters!').required('Required'),
-      })}
+      initialValues={initialFormValues}
+      validationSchema={Yup.object().shape(validationSchema)}
       onSubmit={async (values) => {
-        await onSubmit(values.confirmationCode);
+        await onSubmit(values);
       }}
     >
       {({ submitForm, isSubmitting }) => (
         <Grid container direction='column'>
-          <Grid item>
-            <Field component={TextField} name='confirmationCode' label='Confirmation Code' />
-          </Grid>
-
-          <Grid item>
-            <Button variant='contained' color='primary' disabled={isSubmitting} onClick={submitForm}>
-              Confirm Sign Up
-            </Button>
-          </Grid>
+          {formType === FormType.SIGN_IN && <SignInForm setFormType={setFormType} isSubmitting={isSubmitting} submitForm={submitForm} />}
+          {formType === FormType.SIGN_UP && <SignUpForm setFormType={setFormType} isSubmitting={isSubmitting} submitForm={submitForm} />}
+          {formType === FormType.CONFIRM && <ConfirimForm setFormType={setFormType} isSubmitting={isSubmitting} submitForm={submitForm} />}
         </Grid>
       )}
     </Formik>
