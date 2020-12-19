@@ -79,14 +79,18 @@ async function confirmSignUp({ email, confirmationCode }: ISignupConfirmation) {
   }
 }
 
-const LoginForm: React.FC = () => {
+interface LoginFormProps {
+  onLogin: ({ email, password }) => Promise<void>;
+}
+
+const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   return (
     <MainForm
       onSignUp={async (values: IFormState) => {
         signUp(values);
       }}
       onSignIn={async (values: IFormState) => {
-        signIn(values);
+        onLogin(values);
       }}
       onConfirm={async ({ email, confirmationCode }: IFormState) => confirmSignUp({ email, confirmationCode })}
     />
