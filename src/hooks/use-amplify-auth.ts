@@ -68,7 +68,7 @@ const useAmplifyAuth = (): IUseAmplifyAuth => {
               payload: { user: data },
             });
           }
-          localStorage.setItem('User', data);
+          localStorage.setItem('User', JSON.stringify(data));
         }
       } catch (error) {
         if (isMounted) {

@@ -22,29 +22,33 @@ const ProfileScreen: React.FC = () => {
 
   const { state, handleSignout } = useAmplifyAuth();
 
+  const { isLoading, user } = state;
+
+  const isAuthenticated = !!user;
+
   Logger.info('auth state', state);
 
-  // This renders the custom form
-  if (formState === 'email') {
-    return <LoginForm />;
-  }
-  if (!formState) {
+  if (isLoading) {
     return <Spinner />;
   }
 
-  const isAuthenticated = false;
-
   return (
     <>
-      {isAuthenticated && (
+      {!isAuthenticated && (
         <>
-          <h4>Welcome</h4>
-          <Button>sign out</Button>
+          {formState === 'email' && <LoginForm />}
+          {formState === 'base' && <Buttons updateFormState={setFormSate} />}
         </>
       )}
 
-      {!isAuthenticated && <Buttons updateFormState={setFormSate} />}
-      {isAuthenticated && <div>Is Authenticated</div>}
+      {isAuthenticated && (
+        <>
+          <>
+            <h4>Welcome</h4>
+            <Button>sign out</Button>
+          </>
+        </>
+      )}
     </>
   );
 };
