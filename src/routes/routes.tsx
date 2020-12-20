@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
-import DemoUsers from 'src/screens/demo-users';
 import { useDispatch } from 'react-redux';
 import { isAuthenticatedActionCreator } from 'src/domain/auth';
 import Theme from '../ui/theme';
-import { ROUTE_PROFILE, ROUTE_HOME, DEMO_REDUX } from '../conf/navigation';
+import { ROUTE_PROFILE, ROUTE_HOME } from '../conf/navigation';
 import HomeScreen from '../screens/home-screen';
 import ProfileScreen from '../screens/profile-screen';
 
@@ -32,7 +31,6 @@ const Routes: React.FC = () => {
         <Switch>
           <Route exact path={ROUTE_HOME} component={HomeScreen} />
           <Route exact path={ROUTE_PROFILE} component={ProfileScreen} />
-          <Route exact path={DEMO_REDUX} component={DemoUsers} />
         </Switch>
       </BrowserRouter>
     </ThemeProvider>
