@@ -23,7 +23,7 @@ const httpLink = createHttpLink({
 const authLink = setContext((_, { headers }) => {
   return Auth.currentSession()
     .then((data: any) => {
-      console.log('current session', data.accessToken.jwtToken);
+      console.log('current session bla', data.accessToken.jwtToken);
       return {
         headers: {
           ...headers,
