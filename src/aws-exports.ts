@@ -10,7 +10,7 @@ const awsmobile = {
   aws_appsync_region: 'ap-southeast-1',
   aws_appsync_authenticationType: 'AMAZON_COGNITO_USER_POOLS',
   aws_appsync_apiKey: undefined,
-  // aws_cognito_identity_pool_id: 'ap-southeast-1:b518ad59-fd95-44b7-aca6-c500b5800119',
+  aws_cognito_identity_pool_id: cdkExports.IDENTITY_POOL_ID,
   aws_cognito_region: 'ap-southeast-1',
   aws_user_pools_id: cdkExports.USER_POOL_ID,
   aws_user_pools_web_client_id: cdkExports.WEB_APP_CLIENT_ID,

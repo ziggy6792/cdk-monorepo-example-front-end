@@ -1,7 +1,7 @@
 /* eslint-disable react/button-has-type */
 import React, { useEffect, useState, Fragment, Component } from 'react';
 
-import { Hub } from 'aws-amplify';
+import { Auth, Hub } from 'aws-amplify';
 
 import { Button } from '@material-ui/core';
 import Logger from 'js-logger';
@@ -23,6 +23,15 @@ const ProfileScreen: React.FC = () => {
   const isAuthenticated = useSelector(authSelectors.selectIsAuthenticated);
 
   // Logger.info('auth state', state);
+  useEffect(() => {
+    async function fetchData() {
+      // You can await here
+      const response = await Auth.currentCredentials();
+      console.log('credentials', response);
+      // ...
+    }
+    fetchData();
+  }, []);
 
   if (isLoading) {
     return <Spinner />;

@@ -44,20 +44,29 @@ IUser>('auth/logout', async () => {
 const isAuthenticated = createAsyncThunk<// Return type of the payload creator
 IUser>('auth/isAuthenticatd', async () => {
   let cognitoUser: CognitoUser;
+  // try {
+  //   cognitoUser = await Auth.currentAuthenticatedUser();
+
+  // } catch (err) {
+  //   if (err === 'The user is not authenticated') {
+  //     // If not loggin in then login as guest
+  //     const { email, password } = GuestLogin;
+  //     cognitoUser = await Auth.signIn(email, password);
+  //   } else {
+  //     throw err;
+  //   }
+  // }
+
   try {
-    cognitoUser = await Auth.currentAuthenticatedUser();
+    const unauthUser = await Auth.currentCredentials();
+    console.log('unauthUser', unauthUser);
   } catch (err) {
-    if (err === 'The user is not authenticated') {
-      // If not loggin in then login as guest
-      const { email, password } = GuestLogin;
-      cognitoUser = await Auth.signIn(email, password);
-    } else {
-      throw err;
-    }
+    console.log(err);
   }
-  const user = mapInUser(cognitoUser);
-  saveToStorage(user);
-  return user;
+
+  // const user = mapInUser(cognitoUser);
+  // saveToStorage(user);
+  return null;
 });
 
 const authSlice = createSlice({
