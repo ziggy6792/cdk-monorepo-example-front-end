@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { isAuthenticatedActionCreator } from 'src/domain/auth';
+import * as authSelectors from 'src/domain/auth/selectors';
+import Spinner from 'src/components/spinner';
 import Theme from '../ui/theme';
 import { ROUTE_PROFILE, ROUTE_HOME } from '../conf/navigation';
 import HomeScreen from '../screens/home-screen';
@@ -14,6 +16,12 @@ const Routes: React.FC = () => {
   useEffect(() => {
     dispatch(isAuthenticatedActionCreator());
   }, [dispatch]);
+
+  const isLoading = useSelector(authSelectors.selectIsLoading);
+
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   return (
     <ThemeProvider theme={Theme}>

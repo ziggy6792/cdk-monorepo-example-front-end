@@ -15,18 +15,9 @@ import * as authSelectors from '../../domain/auth/selectors';
 
 const ProfileScreen: React.FC = () => {
   const [formState, setFormSate] = useState('base');
-
   const dispatch = useDispatch();
-
   const user = useSelector(authSelectors.selectUser);
-  const isLoading = useSelector(authSelectors.selectIsLoading);
   const isAuthenticated = useSelector(authSelectors.selectIsAuthenticated);
-
-  // Logger.info('auth state', state);
-
-  if (isLoading) {
-    return <Spinner />;
-  }
 
   return (
     <>
