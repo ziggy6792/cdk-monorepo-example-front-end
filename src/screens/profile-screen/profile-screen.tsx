@@ -10,12 +10,8 @@ import { logoutActionCreator } from 'src/domain/auth';
 import Spinner from '../../components/spinner';
 import Buttons from '../../modules/login-form/Buttons';
 import LoginForm from '../../modules/login-form';
-import useToggle from '../../hooks/use-toggle';
-import * as authSelectors from '../../domain/auth/selectors';
 
-interface State {
-  formState: string;
-}
+import * as authSelectors from '../../domain/auth/selectors';
 
 const ProfileScreen: React.FC = () => {
   const [formState, setFormSate] = useState('base');

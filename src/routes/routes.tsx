@@ -12,14 +12,7 @@ const Routes: React.FC = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    async function fetchData() {
-      // You can await here
-      console.log('start');
-      const result = await dispatch(isAuthenticatedActionCreator());
-      console.log('end', result);
-      // ...
-    }
-    fetchData();
+    dispatch(isAuthenticatedActionCreator());
   }, [dispatch]);
 
   return (
