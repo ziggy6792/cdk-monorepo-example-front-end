@@ -1,13 +1,28 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
 import DemoUsers from 'src/screens/demo-users';
+import { useDispatch } from 'react-redux';
+import { isAuthenticatedActionCreator } from 'src/domain/auth';
 import Theme from '../ui/theme';
 import { ROUTE_PROFILE, ROUTE_HOME, DEMO_REDUX } from '../conf/navigation';
 import HomeScreen from '../screens/home-screen';
 import ProfileScreen from '../screens/profile-screen';
 
-const Routes = () => {
+const Routes: React.FC = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    async function fetchData() {
+      // You can await here
+      console.log('start');
+      const result = await dispatch(isAuthenticatedActionCreator());
+      console.log('end', result);
+      // ...
+    }
+    fetchData();
+  }, [dispatch]);
+
   return (
     <ThemeProvider theme={Theme}>
       <BrowserRouter>

@@ -5,11 +5,13 @@ import { Hub } from 'aws-amplify';
 
 import { Button } from '@material-ui/core';
 import Logger from 'js-logger';
+import { useDispatch, useSelector } from 'react-redux';
+import { logoutActionCreator } from 'src/domain/auth';
 import Spinner from '../../components/spinner';
 import Buttons from '../../modules/login-form/Buttons';
 import LoginForm from '../../modules/login-form';
 import useToggle from '../../hooks/use-toggle';
-import useAmplifyAuth from '../../hooks/use-amplify-auth';
+import * as authSelectors from '../../domain/auth/selectors';
 
 interface State {
   formState: string;
@@ -18,15 +20,13 @@ interface State {
 const ProfileScreen: React.FC = () => {
   const [formState, setFormSate] = useState('base');
 
-  // const [value, toggleValue] = useToggle(true);
+  const dispatch = useDispatch();
 
-  const { state, handleSignout } = useAmplifyAuth();
+  const user = useSelector(authSelectors.selectUser);
+  const isLoading = useSelector(authSelectors.selectIsLoading);
+  const isAuthenticated = useSelector(authSelectors.selectIsAuthenticated);
 
-  const { isLoading, user, isGuest } = state;
-
-  const isAuthenticated = user && !isGuest;
-
-  Logger.info('auth state', state);
+  // Logger.info('auth state', state);
 
   if (isLoading) {
     return <Spinner />;
@@ -44,8 +44,8 @@ const ProfileScreen: React.FC = () => {
       {isAuthenticated && (
         <>
           <>
-            <h4>Welcome</h4>
-            <Button onClick={handleSignout}>sign out</Button>
+            <h4>Welcome {user.displayName}</h4>
+            <Button onClick={() => dispatch(logoutActionCreator())}>sign out</Button>
           </>
         </>
       )}

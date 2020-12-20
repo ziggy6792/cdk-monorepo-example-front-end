@@ -10,8 +10,16 @@ const DemoUsers: React.FC = () => {
   const users = useSelector(selectUsers);
   const isLoading = useSelector(selectUsersLoading);
   const dispatch = useDispatch();
+
   useEffect(() => {
-    dispatch(getUsersActionCreator('http://jsonplaceholder.typicode.com/users/'));
+    async function fetchData() {
+      // You can await here
+      console.log('start');
+      const result = await dispatch(getUsersActionCreator('http://jsonplaceholder.typicode.com/users/'));
+      console.log('end', result);
+      // ...
+    }
+    fetchData();
   }, [dispatch]);
 
   const Spinner = () => {

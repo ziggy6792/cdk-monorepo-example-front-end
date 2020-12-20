@@ -48,13 +48,13 @@ export const client = new ApolloClient({
   resolvers: resolvers as any,
 });
 
-const App = () => (
+const App: React.FC = () => (
   <div className='App' style={{ height: '100vh', width: '100vw' }}>
     <Routes />
   </div>
 );
 
-const WithProvider = () => (
+const WithProvider: React.FC = () => (
   <Provider store={store}>
     <ApolloProvider client={client}>
       <App />

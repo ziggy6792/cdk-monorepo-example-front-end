@@ -6,7 +6,8 @@ import { Formik, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { Button, Grid } from '@material-ui/core';
 import * as Yup from 'yup';
-import useAmplifyAuth from '../../hooks/use-amplify-auth';
+import { useDispatch } from 'react-redux';
+import { loginActionCreator } from 'src/domain/auth';
 
 interface IFormState {
   email: string;
@@ -81,14 +82,14 @@ async function confirmSignUp({ email, confirmationCode }: ISignupConfirmation) {
 }
 
 const LoginForm: React.FC = () => {
-  const { handleSignIn } = useAmplifyAuth();
+  const dispatch = useDispatch();
   return (
     <MainForm
       onSignUp={async (values: IFormState) => {
         signUp(values);
       }}
-      onSignIn={async (values: IFormState) => {
-        handleSignIn(values);
+      onSignIn={async ({ email, password }: IFormState) => {
+        dispatch(loginActionCreator({ email, password }));
       }}
       onConfirm={async ({ email, confirmationCode }: IFormState) => confirmSignUp({ email, confirmationCode })}
     />
@@ -194,7 +195,6 @@ export const MainForm: React.FC<FormProps> = ({ onSignIn, onSignUp, onConfirm })
     case FormType.SIGN_IN:
       onSubmit = async (values: IFormState) => {
         await onSignIn(values);
-        const bla = 1 + 2;
       };
       validationSchema = signInSchema;
       break;
