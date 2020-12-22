@@ -22,58 +22,9 @@ import { initApolloClient } from './util/apollo-client';
 
 Auth.configure(awsconfig);
 
-const httpLink = createHttpLink({
-  uri: awsconfig.aws_appsync_graphqlEndpoint,
-});
-
-// const authLink = setContext((_, { headers }) => {
-//   return Auth.currentSession()
-//     .then((data: any) => {
-//       console.log('current session bla', data.accessToken.jwtToken);
-//       return {
-//         headers: {
-//           ...headers,
-//           Authorization: data.accessToken.jwtToken,
-//         },
-//       };
-//     })
-//     .catch(() => {
-//       // Not authenticated
-//       return {
-//         headers: {
-//           ...headers,
-//         },
-//       };
-//     });
-// });
-
 const IAM_URL = 'https://mnakrqgp7b.execute-api.ap-southeast-1.amazonaws.com/dev/internal/graphql';
 const COGNITO_URL = 'https://mnakrqgp7b.execute-api.ap-southeast-1.amazonaws.com/dev/external/graphql';
 const UNPROTECTED_URL = 'https://mnakrqgp7b.execute-api.ap-southeast-1.amazonaws.com/dev/unprotected/graphql';
-
-// const awsGraphqlFetch = (uri: string, options) => {
-//   // uri = 'https://mnakrqgp7b.execute-api.ap-southeast-1.amazonaws.com/dev/unprotected/graphql'
-
-//   return Auth.currentCredentials().then((data) => {
-//     const interceptor = aws4Interceptor(
-//       {
-//         region: 'ap-southeast-1',
-//         service: 'execute-api',
-//       },
-//       {
-//         accessKeyId: data.accessKeyId,
-//         secretAccessKey: data.secretAccessKey,
-//         sessionToken: data.sessionToken,
-//       }
-//     );
-//     const axiosInstance = axios.create();
-//     axiosInstance.interceptors.request.use(interceptor);
-
-//     console.log('HERE!');
-//     return buildAxiosFetch(axiosInstance);
-//   });
-// };
-// const url = 'https://mnakrqgp7b.execute-api.ap-southeast-1.amazonaws.com/dev/internal/graphql';
 
 interface ICredentials {
   accessKeyId: string;
@@ -113,7 +64,6 @@ const awsGraphqlFetch = async (uri: string, options: any) => {
 
     return cognitoFetch(COGNITO_URL, options);
   } catch (err) {
-    console.log('ERROR', err);
     if (err === 'No current user') {
       console.log('Not logged in');
       const credentials = await Auth.currentCredentials();
@@ -124,10 +74,6 @@ const awsGraphqlFetch = async (uri: string, options: any) => {
     }
   }
   return fetch(UNPROTECTED_URL, options);
-
-  // const iamFetch = await buildIamFetch();
-
-  // return iamFetch(IAM_URL, options);
 };
 
 const client = new ApolloClient({
