@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable max-len */
 import React from 'react';
 
@@ -50,6 +51,14 @@ const buildIamFetch = (credentials: ICredentials) => {
     },
     { accessKeyId: credentials.accessKeyId, secretAccessKey: credentials.secretAccessKey, sessionToken: credentials.sessionToken }
   );
+
+  // Remove unsafe headers
+  axiosInstance.interceptors.request.use((config) => {
+    delete config.headers.Host;
+    delete config.headers['Content-Length'];
+    return config;
+  });
+
   axiosInstance.interceptors.request.use(interceptor);
 
   return buildAxiosFetch(axiosInstance);
@@ -71,6 +80,13 @@ const awsGraphqlFetch = async (uri: string, options: any) => {
       const iamFetch = buildIamFetch(credentials);
 
       return iamFetch(IAM_URL, options);
+
+      // const newFetch = async (uri: string, options: any) => {
+      //   const ret = await iamFetch(uri, options);
+      //   console.log('IAM FETCH', JSON.stringify(ret));
+      //   return ret;
+      // };
+      // return newFetch(IAM_URL, options);
     }
   }
   return fetch(UNPROTECTED_URL, options);
