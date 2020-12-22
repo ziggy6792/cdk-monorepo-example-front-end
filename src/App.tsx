@@ -52,7 +52,7 @@ const buildIamFetch = (credentials: ICredentials) => {
     { accessKeyId: credentials.accessKeyId, secretAccessKey: credentials.secretAccessKey, sessionToken: credentials.sessionToken }
   );
 
-  // Remove unsafe headers
+  // Remove unsafe headers which are set by the browser instead
   axiosInstance.interceptors.request.use((config) => {
     delete config.headers.Host;
     delete config.headers['Content-Length'];
