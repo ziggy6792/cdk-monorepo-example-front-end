@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@aws-amplify/auth": "^3.4.15",
+    "@lifeomic/axios-fetch": "^1.4.2",
     "@material-ui/core": "^4.11.2",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.57",
@@ -20,9 +21,10 @@
     "@types/react-router-dom": "^5.1.6",
     "apollo-cache-inmemory": "^1.6.6",
     "apollo-client": "^2.6.10",
-    "apollo-link-context": "^1.0.20",
     "apollo-link-http": "^1.5.17",
     "aws-amplify": "^3.3.12",
+    "aws4-axios": "^2.0.1",
+    "axios": "^0.19.2",
     "formik": "^2.2.6",
     "formik-material-ui": "^3.0.1",
     "graphql-tag": "^2.11.0",
@@ -38,6 +40,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
     "typescript": "^4.0.3",
+    "url": "^0.11.0",
     "use-immer": "^0.4.2",
     "web-vitals": "^0.2.4",
     "yup": "^0.32.8"
