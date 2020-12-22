@@ -1,7 +1,6 @@
 import { CognitoUser } from '@aws-amplify/auth';
 import { createAsyncThunk, createSlice, SerializedError } from '@reduxjs/toolkit';
-import { Auth, Hub } from 'aws-amplify';
-import { GuestLogin } from 'src/conf/content';
+import { Auth } from 'aws-amplify';
 import IUser, { mapInUser } from './user';
 
 interface ILoginParams {
@@ -18,13 +17,17 @@ const saveToStorage = (user: IUser) => {
   localStorage.setItem('User', JSON.stringify(user));
 };
 
+const cleatStorage = () => {
+  localStorage.removeItem('User');
+};
+
 const login = createAsyncThunk<
   // Return type of the payload creator
   IUser,
   // First argument to the payload creator
   ILoginParams
   // Types for ThunkAPI
->('auth/login', async ({ email, password }, thunkApi) => {
+>('auth/login', async ({ email, password }) => {
   const cognitoUser = await Auth.signIn(email, password);
   const user = mapInUser(cognitoUser);
   saveToStorage(user);
@@ -34,39 +37,27 @@ const login = createAsyncThunk<
 const logout = createAsyncThunk<// Return type of the payload creator
 IUser>('auth/logout', async () => {
   // First argument to the payload creator
-  const { email, password } = GuestLogin;
-  const cognitoUser = await Auth.signIn(email, password);
-  const user = mapInUser(cognitoUser);
-  saveToStorage(user);
-  return user;
+  await Auth.signOut();
+  cleatStorage();
+  return null;
 });
 
 const isAuthenticated = createAsyncThunk<// Return type of the payload creator
 IUser>('auth/isAuthenticatd', async () => {
-  let cognitoUser: CognitoUser;
-  // try {
-  //   cognitoUser = await Auth.currentAuthenticatedUser();
-
-  // } catch (err) {
-  //   if (err === 'The user is not authenticated') {
-  //     // If not loggin in then login as guest
-  //     const { email, password } = GuestLogin;
-  //     cognitoUser = await Auth.signIn(email, password);
-  //   } else {
-  //     throw err;
-  //   }
-  // }
-
+  let cognitoUser: CognitoUser = null;
   try {
-    const unauthUser = await Auth.currentCredentials();
-    console.log('unauthUser', unauthUser);
+    cognitoUser = await Auth.currentAuthenticatedUser();
   } catch (err) {
-    console.log(err);
+    if (err === 'The user is not authenticated') {
+      // Do nothing
+    } else {
+      throw err;
+    }
   }
 
-  // const user = mapInUser(cognitoUser);
-  // saveToStorage(user);
-  return null;
+  const user = mapInUser(cognitoUser);
+  saveToStorage(user);
+  return user;
 });
 
 const authSlice = createSlice({
