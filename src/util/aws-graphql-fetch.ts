@@ -11,9 +11,9 @@ import Axios from 'axios';
 import { buildAxiosFetch } from '@lifeomic/axios-fetch';
 
 interface IAwsGraphqlFetchConfig {
-  aws_graphqlEndpoint_external: string;
-  aws_graphqlEndpoint_internal: string;
-  aws_graphqlEndpoint_unprotected: string;
+  aws_graphqlEndpoint_authUser: string;
+  aws_graphqlEndpoint_authRole: string;
+  aws_graphqlEndpoint_authNone: string;
 }
 
 let gqFetchConfig: IAwsGraphqlFetchConfig | null = null;
@@ -61,18 +61,14 @@ export const configure = (config: IAwsGraphqlFetchConfig) => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const awsGraphqlFetch = async (uri: string, options: any): Promise<any> => {
-  const {
-    aws_graphqlEndpoint_external: EXTERNAL_URL,
-    aws_graphqlEndpoint_internal: INTERNAL_URL,
-    aws_graphqlEndpoint_unprotected: UNPROTECTED_URL,
-  } = gqFetchConfig;
+  const { aws_graphqlEndpoint_authUser: USER_AUTH_URL, aws_graphqlEndpoint_authRole: ROLE_AUTH_URL, aws_graphqlEndpoint_authNone: NO_AUTH_URL } = gqFetchConfig;
 
   try {
     const cognitoUser = await Auth.currentSession();
 
     const cognitoFetch = buildCognitoFetch(cognitoUser.getAccessToken().getJwtToken());
 
-    return cognitoFetch(EXTERNAL_URL, options);
+    return cognitoFetch(USER_AUTH_URL, options);
   } catch (err) {
     if (err === 'No current user') {
       console.log('Not logged in');
@@ -81,7 +77,7 @@ export const awsGraphqlFetch = async (uri: string, options: any): Promise<any> =
 
         const iamFetch = buildIamFetch(credentials);
 
-        return iamFetch(INTERNAL_URL, options);
+        return iamFetch(ROLE_AUTH_URL, options);
       } catch (err) {
         console.log('Error getting unauthorized user credentials', err);
       }
@@ -89,7 +85,7 @@ export const awsGraphqlFetch = async (uri: string, options: any): Promise<any> =
       throw err;
     }
   }
-  return fetch(UNPROTECTED_URL, options);
+  return fetch(NO_AUTH_URL, options);
 };
 
 export default awsGraphqlFetch;
