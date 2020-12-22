@@ -10,7 +10,13 @@ import { aws4Interceptor } from 'aws4-axios';
 import Axios from 'axios';
 import { buildAxiosFetch } from '@lifeomic/axios-fetch';
 
-let config: IAwsGraphqlFetchConfig | null = null;
+interface IAwsGraphqlFetchConfig {
+  aws_graphqlEndpoint_external: string;
+  aws_graphqlEndpoint_internal: string;
+  aws_graphqlEndpoint_unprotected: string;
+}
+
+let gqFetchConfig: IAwsGraphqlFetchConfig | null = null;
 
 interface ICredentials {
   accessKeyId: string;
@@ -49,19 +55,17 @@ const buildIamFetch = (credentials: ICredentials) => {
   return buildAxiosFetch(axiosInstance);
 };
 
-interface IAwsGraphqlFetchConfig {
-  aws_graphqlEndpoint_external: string;
-  aws_graphqlEndpoint_internal: string;
-  aws_graphqlEndpoint_unprotected: string;
-}
-
-export const configure = (conf: IAwsGraphqlFetchConfig) => {
-  config = conf;
+export const configure = (config: IAwsGraphqlFetchConfig) => {
+  gqFetchConfig = config;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const awsGraphqlFetch = async (uri: string, options: any): Promise<any> => {
-  const { aws_graphqlEndpoint_external: EXTERNAL_URL, aws_graphqlEndpoint_internal: INTERNAL_URL, aws_graphqlEndpoint_unprotected: UNPROTECTED_URL } = config;
+  const {
+    aws_graphqlEndpoint_external: EXTERNAL_URL,
+    aws_graphqlEndpoint_internal: INTERNAL_URL,
+    aws_graphqlEndpoint_unprotected: UNPROTECTED_URL,
+  } = gqFetchConfig;
 
   try {
     const cognitoUser = await Auth.currentSession();
@@ -87,37 +91,5 @@ export const awsGraphqlFetch = async (uri: string, options: any): Promise<any> =
   }
   return fetch(UNPROTECTED_URL, options);
 };
-
-// const awsGraphqlFetch2 = (fetchConfig: IFetchConfig) => async (uri: string, options: any): Promise<any> => {
-//   const {
-//     aws_graphqlEndpoint_external: EXTERNAL_URL,
-//     aws_graphqlEndpoint_internal: INTERNAL_URL,
-//     aws_graphqlEndpoint_unprotected: UNPROTECTED_URL,
-//   } = fetchConfig;
-
-//   try {
-//     const cognitoUser = await Auth.currentSession();
-
-//     const cognitoFetch = buildCognitoFetch(cognitoUser.getAccessToken().getJwtToken());
-
-//     return cognitoFetch(EXTERNAL_URL, options);
-//   } catch (err) {
-//     if (err === 'No current user') {
-//       console.log('Not logged in');
-//       try {
-//         const credentials = await Auth.currentCredentials();
-
-//         const iamFetch = buildIamFetch(credentials);
-
-//         return iamFetch(INTERNAL_URL, options);
-//       } catch (err) {
-//         console.log('Error getting unauthorized user credentials', err);
-//       }
-//     } else {
-//       throw err;
-//     }
-//   }
-//   return fetch(UNPROTECTED_URL, options);
-// };
 
 export default awsGraphqlFetch;
