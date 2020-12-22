@@ -11,6 +11,7 @@ import Axios from 'axios';
 import { buildAxiosFetch } from '@lifeomic/axios-fetch';
 
 interface IAwsGraphqlFetchConfig {
+  aws_project_region: string;
   aws_graphqlEndpoint_authUser: string;
   aws_graphqlEndpoint_authRole: string;
   aws_graphqlEndpoint_authNone: string;
@@ -37,7 +38,7 @@ const buildIamFetch = (credentials: ICredentials) => {
 
   const interceptor = aws4Interceptor(
     {
-      region: 'ap-southeast-1',
+      region: gqFetchConfig.aws_project_region,
       service: 'execute-api',
     },
     { accessKeyId: credentials.accessKeyId, secretAccessKey: credentials.secretAccessKey, sessionToken: credentials.sessionToken }
