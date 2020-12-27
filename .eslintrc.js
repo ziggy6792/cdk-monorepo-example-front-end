@@ -1,15 +1,17 @@
 module.exports = {
+  ignorePatterns: ['build', '*.config.js', 'node_modules'],
   extends: [
     'airbnb-typescript',
     'airbnb/hooks',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:jest/recommended',
     'prettier',
     'prettier/react',
     'prettier/@typescript-eslint',
     'plugin:prettier/recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:jest/recommended',
   ],
-  plugins: ['react', '@typescript-eslint', 'jest'],
+  // plugins: ['react', '@typescript-eslint', 'jest'],
+  plugins: [],
   env: {
     browser: true,
     es6: true,

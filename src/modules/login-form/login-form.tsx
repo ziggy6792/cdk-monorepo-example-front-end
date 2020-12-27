@@ -6,6 +6,8 @@ import { Formik, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { Button, Grid } from '@material-ui/core';
 import * as Yup from 'yup';
+import { useDispatch } from 'react-redux';
+import { loginActionCreator } from 'src/domain/auth';
 
 interface IFormState {
   email: string;
@@ -80,13 +82,14 @@ async function confirmSignUp({ email, confirmationCode }: ISignupConfirmation) {
 }
 
 const LoginForm: React.FC = () => {
+  const dispatch = useDispatch();
   return (
     <MainForm
       onSignUp={async (values: IFormState) => {
         signUp(values);
       }}
-      onSignIn={async (values: IFormState) => {
-        signIn(values);
+      onSignIn={async ({ email, password }: IFormState) => {
+        dispatch(loginActionCreator({ email, password }));
       }}
       onConfirm={async ({ email, confirmationCode }: IFormState) => confirmSignUp({ email, confirmationCode })}
     />
@@ -190,7 +193,9 @@ export const MainForm: React.FC<FormProps> = ({ onSignIn, onSignUp, onConfirm })
 
   switch (formType) {
     case FormType.SIGN_IN:
-      onSubmit = async (values: IFormState) => onSignIn(values);
+      onSubmit = async (values: IFormState) => {
+        await onSignIn(values);
+      };
       validationSchema = signInSchema;
       break;
     case FormType.SIGN_UP:
@@ -214,8 +219,13 @@ export const MainForm: React.FC<FormProps> = ({ onSignIn, onSignUp, onConfirm })
     <Formik
       initialValues={initialFormValues}
       validationSchema={Yup.object().shape(validationSchema)}
-      onSubmit={async (values) => {
+      onSubmit={async (values, { setSubmitting }) => {
+        setSubmitting(true);
+        console.log('start');
         await onSubmit(values);
+        console.log('end');
+
+        setSubmitting(false);
       }}
     >
       {({ submitForm, isSubmitting }) => (
