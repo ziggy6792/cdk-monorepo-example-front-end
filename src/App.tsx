@@ -8,14 +8,14 @@ import Auth from '@aws-amplify/auth';
 import awsconfig from './cdk-exports';
 import Routes from './routes';
 import store from './conf/store';
-import * as GqFetch from './util/aws-graphql-fetch';
+import * as ApiFetch from './util/aws-api-fetch';
 
 Auth.configure(awsconfig);
-GqFetch.configure(awsconfig);
+ApiFetch.configure(awsconfig);
 
 const client = new ApolloClient({
   link: createHttpLink({
-    fetch: GqFetch.awsGraphqlFetch,
+    fetch: ApiFetch.awsApiFetch,
   }),
   cache: new InMemoryCache(),
 });

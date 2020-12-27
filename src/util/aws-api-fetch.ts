@@ -36,6 +36,13 @@ const buildCognitoFetch = (jwtToken: string) => {
 const buildIamFetch = (credentials: ICredentials) => {
   const axiosInstance = Axios.create();
 
+  // Remove unsafe headers which are set by the browser instead
+  axiosInstance.interceptors.request.use((config) => {
+    delete config.headers.Host;
+    delete config.headers['Content-Length'];
+    return config;
+  });
+
   const interceptor = aws4Interceptor(
     {
       region: gqFetchConfig.aws_project_region,
@@ -43,13 +50,6 @@ const buildIamFetch = (credentials: ICredentials) => {
     },
     { accessKeyId: credentials.accessKeyId, secretAccessKey: credentials.secretAccessKey, sessionToken: credentials.sessionToken }
   );
-
-  // Remove unsafe headers which are set by the browser instead
-  axiosInstance.interceptors.request.use((config) => {
-    delete config.headers.Host;
-    delete config.headers['Content-Length'];
-    return config;
-  });
 
   axiosInstance.interceptors.request.use(interceptor);
 
@@ -61,7 +61,7 @@ export const configure = (config: IAwsGraphqlFetchConfig) => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const awsGraphqlFetch = async (uri: string, options: any): Promise<any> => {
+export const awsApiFetch = async (uri: string, options: any): Promise<any> => {
   const { aws_graphqlEndpoint_authUser: USER_AUTH_URL, aws_graphqlEndpoint_authRole: ROLE_AUTH_URL, aws_graphqlEndpoint_authNone: NO_AUTH_URL } = gqFetchConfig;
 
   try {
@@ -89,4 +89,4 @@ export const awsGraphqlFetch = async (uri: string, options: any): Promise<any> =
   return fetch(NO_AUTH_URL, options);
 };
 
-export default awsGraphqlFetch;
+export default awsApiFetch;

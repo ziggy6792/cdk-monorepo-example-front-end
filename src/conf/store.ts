@@ -1,5 +1,5 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
-import authReducer, { AuthState } from '../domain/auth';
+import authReducer, { AuthState } from 'src/domain/auth';
 
 export interface IRootState {
   readonly auth: AuthState;
