@@ -5,7 +5,7 @@ import { ApolloProvider } from 'react-apollo';
 import { createHttpLink } from 'apollo-link-http';
 import { Provider } from 'react-redux';
 import Auth from '@aws-amplify/auth';
-import awsconfig from './cdk-exports';
+import awsconfig from './util/aws-config';
 import Routes from './routes';
 import store from './conf/store';
 import * as ApiFetch from './util/aws-api-fetch';
