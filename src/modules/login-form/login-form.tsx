@@ -89,7 +89,7 @@ const LoginForm: React.FC = () => {
         signUp(values);
       }}
       onSignIn={async ({ email, password }: IFormState) => {
-        dispatch(loginActionCreator({ email, password }));
+        dispatch(loginActionCreator({ type: 'email', email, password }));
       }}
       onConfirm={async ({ email, confirmationCode }: IFormState) => confirmSignUp({ email, confirmationCode })}
     />

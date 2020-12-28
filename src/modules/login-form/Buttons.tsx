@@ -2,9 +2,10 @@
 import React from 'react';
 
 import { Auth } from 'aws-amplify';
-import { FaFacebook, FaGoogle, FaEnvelope } from 'react-icons/fa';
 import { Button, Grid } from '@material-ui/core';
 import { Email, Facebook } from '@material-ui/icons';
+import { useDispatch } from 'react-redux';
+import { loginActionCreator } from 'src/domain/auth';
 import withAuthenticator from '../../hoc/withAuthenticator/with-authenticator';
 
 interface IButtonsProps {
@@ -12,10 +13,12 @@ interface IButtonsProps {
 }
 
 const Buttons: React.FC<IButtonsProps> = ({ updateFormState }) => {
+  const dispatch = useDispatch();
+
   return (
     <Grid container direction='column' justify='center' alignItems='center' style={{ height: '100%' }}>
       <Grid item>
-        <Button color='primary' endIcon={<Facebook />} onClick={() => console.log({ authType: 'Facebook' })}>
+        <Button color='primary' endIcon={<Facebook />} onClick={() => dispatch(loginActionCreator({ type: 'facebook' }))}>
           Facebook
         </Button>
       </Grid>

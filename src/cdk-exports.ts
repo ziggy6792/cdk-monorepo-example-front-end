@@ -10,6 +10,14 @@ const cdkExports = {
   aws_graphqlEndpoint_authUser: 'http://localhost:3100/lambda-gq-resolver/graphql',
   aws_graphqlEndpoint_authRole: 'http://localhost:3100/lambda-gq-resolver/graphql',
   aws_graphqlEndpoint_authNone: 'http://localhost:3100/lambda-gq-resolver/graphql',
+  // extra
+  oauth: {
+    domain: 'alpaca-dev.auth.ap-southeast-1.amazoncognito.com',
+    scope: ['phone', 'email', 'openid', 'profile', 'aws.cognito.signin.user.admin'],
+    redirectSignIn: 'http://localhost:3000/profile/',
+    redirectSignOut: 'http://localhost:3000/profile/',
+    responseType: 'code',
+  },
 };
 
 const exports = {
