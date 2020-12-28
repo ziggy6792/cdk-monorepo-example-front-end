@@ -1,12 +1,21 @@
-import { CognitoUser } from '@aws-amplify/auth';
+/* eslint-disable no-case-declarations */
+import { CognitoHostedUIIdentityProvider, CognitoUser } from '@aws-amplify/auth';
 import { createAsyncThunk, createSlice, SerializedError } from '@reduxjs/toolkit';
 import { Auth } from 'aws-amplify';
 import IUser, { mapInUser } from './user';
 
-interface ILoginParams {
+interface ILoginParamsEmail {
+  type: 'email';
   email: string;
   password: string;
 }
+
+interface ILoginParamsFacebook {
+  type: 'facebook';
+}
+
+type ILoginParams = ILoginParamsEmail | ILoginParamsFacebook;
+
 export interface AuthState {
   isLoading: boolean;
   error: SerializedError | string;
@@ -27,8 +36,23 @@ const login = createAsyncThunk<
   // First argument to the payload creator
   ILoginParams
   // Types for ThunkAPI
->('auth/login', async ({ email, password }) => {
-  const cognitoUser = await Auth.signIn(email, password);
+>('auth/login', async (payload) => {
+  let cognitoUser: CognitoUser;
+
+  switch (payload.type) {
+    case 'email':
+      cognitoUser = await Auth.signIn(payload.email, payload.password);
+      break;
+    case 'facebook':
+      const credentials = await Auth.federatedSignIn({ provider: CognitoHostedUIIdentityProvider.Facebook });
+      console.log('credentials', credentials);
+
+      cognitoUser = await Auth.currentAuthenticatedUser();
+      break;
+    default:
+      throw new Error('Not regognized');
+  }
+
   const user = mapInUser(cognitoUser);
   saveToStorage(user);
   return user;
@@ -76,6 +100,7 @@ const authSlice = createSlice({
     });
     builder.addCase(login.rejected, (state, action: any) => {
       state.isLoading = false;
+      console.log('login error', action.error);
       state.error = action.error;
     });
     builder.addCase(login.fulfilled, (state, { payload }) => {
